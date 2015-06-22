@@ -1,117 +1,118 @@
-.386
-.model flat,stdcall
-option casemap:none
-include masm32\include\msvcrt.inc
-includelib msvcrt.lib
-printf  proto C:dword,:dword
-.data
-lb_write_int db '%d',0
-lb_writeln_int db '%d',0ah,0dh,0
-lb_write_real db '%lf',0
-lb_writeln_real db '%lf',0ah,0dh,0
-lb_tmp db 0, 0, 0, 0, 0, 0, 0, 0
-lb_read_int db '%d',0
-lb_read_real db '%f',0
-.code
+.PRINTF_U:
+	.string "%u"
+.PRINTF_U_N:
+	.string "%u\n"
+.PRINTF_F:
+	.string "%f"
+.PRINTF_F_N:
+	.string "%f\n"
+.text
 gcd: 
-sub %esp, 4
-mov %edi, 8
-mov %esi, %ecx
-add %esi, %edi
-mov %eax, (%esi); calculate ExpId 
-push %eax
-mov %eax, 0; calculate int ExpConst 
-push %eax
-pop %ebx
-pop %eax
-cmp %eax, %ebx
-mov %eax, 0
-sete %al
-cmp %eax, 1
+subl $4, %esp
+movl $8, %edi
+movl %ecx, %esi
+addl %edi, %esi
+movl (%esi), %eax	# calculate ExpId 
+pushl %eax
+movl $0, %eax	# calculate int ExpConst 
+pushl %eax
+popl %ebx
+popl %eax
+cmpl %ebx, %eax
+movl $0, %eax
+seteb %al
+cmpl $1, %eax
 je __CG__label0 
 jmp __CG__label1
 __CG__label0:
-mov %edi, 4
-mov %esi, %ecx
-add %esi, %edi
-mov %eax, (%esi); calculate ExpId 
-push %eax
-mov %edi, 12
-mov %esi, %ecx
-add %esi, %edi
-mov %eax, (%esi); calculate ExpId 
-pop %eax
-mov -0(%esi), %eax; assign
+movl $4, %edi
+movl %ecx, %esi
+addl %edi, %esi
+movl (%esi), %eax	# calculate ExpId 
+pushl %eax
+movl $12, %edi
+movl %ecx, %esi
+addl %edi, %esi
+movl (%esi), %eax	# calculate ExpId 
+popl %eax
+movl %eax, -0(%esi)	# assign
 jmp __CG__label2
 __CG__label1: 
-push %eax
-mov %edi, 4
-mov %esi, %ecx
-add %esi, %edi
-mov %eax, (%esi); calculate ExpId 
-push %eax
-mov %edi, 8
-mov %esi, %ecx
-add %esi, %edi
-mov %eax, (%esi); calculate ExpId 
-push %eax
-pop %ebx
-pop %eax
-xor %edx, %edx
-idiv %ebx
-mov %eax,%edx
-push %eax
-mov %edi, 8
-mov %esi, %ecx
-add %esi, %edi
-mov %eax, (%esi); calculate ExpId 
-push %eax
-push %ecx
-mov %ecx, %esp
+pushl %eax
+movl $4, %edi
+movl %ecx, %esi
+addl %edi, %esi
+movl (%esi), %eax	# calculate ExpId 
+pushl %eax
+movl $8, %edi
+movl %ecx, %esi
+addl %edi, %esi
+movl (%esi), %eax	# calculate ExpId 
+pushl %eax
+popl %ebx
+popl %eax
+xorl %edx, %edx
+idivl %ebx
+movl %edx, %eax
+pushl %eax
+movl $8, %edi
+movl %ecx, %esi
+addl %edi, %esi
+movl (%esi), %eax	# calculate ExpId 
+pushl %eax
+pushl %ecx
+movl %esp, %ecx
 call gcd
-pop %ecx
-pop %eax
-pop %eax
-pop %eax
-push %eax
-mov %edi, 12
-mov %esi, %ecx
-add %esi, %edi
-mov %eax, (%esi); calculate ExpId 
-pop %eax
-mov -0(%esi), %eax; assign
+popl %ecx
+popl %eax
+popl %eax
+popl %eax
+pushl %eax
+movl $12, %edi
+movl %ecx, %esi
+addl %edi, %esi
+movl (%esi), %eax	# calculate ExpId 
+popl %eax
+movl %eax, -0(%esi)	# assign
 __CG__label2: 
-add %esp, 4
+addl $4, %esp
 ret
-main PROC
-mov %ecx, %esp
-sub %esp, 12
-push %eax
-mov %eax, 24; calculate int ExpConst 
-push %eax
-mov %eax, 36; calculate int ExpConst 
-push %eax
-push %ecx
-mov %ecx, %esp
+.globl main
+	.type main, @function
+main:
+pushl %ebp
+movl %esp, %ebp
+movl %esp, %ecx
+subl $12, %esp
+pushl %eax
+movl $24, %eax	# calculate int ExpConst 
+pushl %eax
+movl $36, %eax	# calculate int ExpConst 
+pushl %eax
+pushl %ecx
+movl %esp, %ecx
 call gcd
-pop %ecx
-pop %eax
-pop %eax
-pop %eax
-push %eax
-mov %edi, -12
-mov %esi, %ecx
-add %esi, %edi
-mov %eax, (%esi); calculate ExpId 
-pop %eax
-mov -0(%esi), %eax; assign
-mov %edi, -12
-mov %esi, %ecx
-add %esi, %edi
-mov %eax, (%esi); calculate ExpId 
+popl %ecx
+popl %eax
+popl %eax
+popl %eax
+pushl %eax
+movl $-12, %edi
+movl %ecx, %esi
+addl %edi, %esi
+movl (%esi), %eax	# calculate ExpId 
+popl %eax
+movl %eax, -0(%esi)	# assign
+movl $-12, %edi
+movl %ecx, %esi
+addl %edi, %esi
+movl (%esi), %eax	# calculate ExpId 
 pusha
-invoke printf,offset lb_write_int, %eax
+pushl %eax
+pushl $.PRINTF_U
+call printf
+addl $8, %esp
 popa
-add %esp, 12
-main ENDP
-END main
+addl $12, %esp
+leave
+ret
