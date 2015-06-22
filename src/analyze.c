@@ -9,7 +9,7 @@ void insertNode(TreeNode* t) {
 	if(t == NULL) 
 		return;
 	if(t->nodekind == NODE_DECLARE) {
-		switch(t->kind.decl) {
+		switch(t->kind.decl+(NODE_DECLARE<<4)) {
 			case DECL_CONST:
 			{
 				while(t != NULL) {
@@ -25,7 +25,7 @@ void insertNode(TreeNode* t) {
 					TreeNode* pname = t->child[0];
 					TreeNode* ptype = t->child[1];
 					while(pname != NULL) {
-						switch(ptype->kind.type) {
+						switch(ptype->kind.type+(NODE_TYPE<<4)) {
 								case TYPE_SIMPLE_ID:
 								{
 									TypeList l = typeListLookup(ptype->attr.name);
@@ -130,7 +130,7 @@ void insertNode(TreeNode* t) {
 			case DECL_TYPE:
 			{
 				while(t) {
-					switch(t->child[1]->kind.type) {
+					switch(t->child[1]->kind.type+(NODE_TYPE<<4)) {
 						case TYPE_SIMPLE_ID: 
 						{
 							typeListAliaseInsert(t->child[0]->attr.name, t->child[1]->attr.name);	
@@ -238,6 +238,7 @@ void traverse(TreeNode* t) {
 int buildSymtab(TreeNode* syntaxTree) {
 	offset = -4;
 	traverse(syntaxTree);
+	printf("here %d \n",TraceAnalyze);
 	if(TraceAnalyze) {
 		fprintf(listing, "\nSymbol table:\n\n");
 		printSymTab(listing);
