@@ -1,14 +1,13 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+/* A Bison parser, made by GNU Bison 3.0.2.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,9 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -33,84 +30,93 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Tokens.  */
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     TOKEN_PROGRAM = 258,
-     TOKEN_FUNCTION = 259,
-     TOKEN_PROCEDURE = 260,
-     TOKEN_CONST = 261,
-     TOKEN_TYPE = 262,
-     TOKEN_VAR = 263,
-     TOKEN_IF = 264,
-     TOKEN_THEN = 265,
-     TOKEN_ELSE = 266,
-     TOKEN_REPEAT = 267,
-     TOKEN_UNTIL = 268,
-     TOKEN_WHILE = 269,
-     TOKEN_DO = 270,
-     TOKEN_CASE = 271,
-     TOKEN_TO = 272,
-     TOKEN_DOWNTO = 273,
-     TOKEN_FOR = 274,
-     TOKEN_EQUAL = 275,
-     TOKEN_UNEQUAL = 276,
-     TOKEN_GE = 277,
-     TOKEN_GT = 278,
-     TOKEN_LE = 279,
-     TOKEN_LT = 280,
-     TOKEN_ASSIGN = 281,
-     TOKEN_PLUS = 282,
-     TOKEN_MINUS = 283,
-     TOKEN_MUL = 284,
-     TOKEN_DIV = 285,
-     TOKEN_OR = 286,
-     TOKEN_AND = 287,
-     TOKEN_NOT = 288,
-     TOKEN_MOD = 289,
-     TOKEN_READ = 290,
-     TOKEN_WRITE = 291,
-     TOKEN_WRITELN = 292,
-     TOKEN_LB = 293,
-     TOKEN_RB = 294,
-     TOKEN_SEMI = 295,
-     TOKEN_DOT = 296,
-     TOKEN_DOTDOT = 297,
-     TOKEN_LP = 298,
-     TOKEN_RP = 299,
-     TOKEN_COMMA = 300,
-     TOKEN_COLON = 301,
-     TOKEN_INTEGER_TYPE = 302,
-     TOKEN_BOOLEAN_TYPE = 303,
-     TOKEN_CHAR_TYPE = 304,
-     TOKEN_REAL_TYPE = 305,
-     TOKEN_TRUE = 306,
-     TOKEN_FALSE = 307,
-     TOKEN_MAXINT = 308,
-     TOKEN_ARRAY = 309,
-     TOKEN_OF = 310,
-     TOKEN_RECORD = 311,
-     TOKEN_BEGIN = 312,
-     TOKEN_END = 313,
-     TOKEN_GOTO = 314,
-     TOKEN_ID = 315,
-     TOKEN_INT = 316,
-     TOKEN_REAL = 317,
-     TOKEN_CHAR = 318,
-     TOKEN_STRING = 319,
-     ERROR = 320,
-     TOKEN_ABS = 321,
-     TOKEN_CHR = 322,
-     TOKEN_ODD = 323,
-     TOKEN_ORD = 324,
-     TOKEN_PRED = 325,
-     TOKEN_SQR = 326,
-     TOKEN_SQRT = 327,
-     TOKEN_SUCC = 328
-   };
+  enum yytokentype
+  {
+    TOKEN_PROGRAM = 258,
+    TOKEN_FUNCTION = 259,
+    TOKEN_PROCEDURE = 260,
+    TOKEN_CONST = 261,
+    TOKEN_TYPE = 262,
+    TOKEN_VAR = 263,
+    TOKEN_IF = 264,
+    TOKEN_THEN = 265,
+    TOKEN_ELSE = 266,
+    TOKEN_REPEAT = 267,
+    TOKEN_UNTIL = 268,
+    TOKEN_WHILE = 269,
+    TOKEN_DO = 270,
+    TOKEN_CASE = 271,
+    TOKEN_TO = 272,
+    TOKEN_DOWNTO = 273,
+    TOKEN_FOR = 274,
+    TOKEN_EQUAL = 275,
+    TOKEN_UNEQUAL = 276,
+    TOKEN_GE = 277,
+    TOKEN_GT = 278,
+    TOKEN_LE = 279,
+    TOKEN_LT = 280,
+    TOKEN_ASSIGN = 281,
+    TOKEN_PLUS = 282,
+    TOKEN_MINUS = 283,
+    TOKEN_MUL = 284,
+    TOKEN_DIV = 285,
+    TOKEN_OR = 286,
+    TOKEN_AND = 287,
+    TOKEN_NOT = 288,
+    TOKEN_MOD = 289,
+    TOKEN_READ = 290,
+    TOKEN_WRITE = 291,
+    TOKEN_WRITELN = 292,
+    TOKEN_LB = 293,
+    TOKEN_RB = 294,
+    TOKEN_SEMI = 295,
+    TOKEN_DOT = 296,
+    TOKEN_DOTDOT = 297,
+    TOKEN_LP = 298,
+    TOKEN_RP = 299,
+    TOKEN_COMMA = 300,
+    TOKEN_COLON = 301,
+    TOKEN_INTEGER_TYPE = 302,
+    TOKEN_BOOLEAN_TYPE = 303,
+    TOKEN_CHAR_TYPE = 304,
+    TOKEN_REAL_TYPE = 305,
+    TOKEN_TRUE = 306,
+    TOKEN_FALSE = 307,
+    TOKEN_MAXINT = 308,
+    TOKEN_ARRAY = 309,
+    TOKEN_OF = 310,
+    TOKEN_RECORD = 311,
+    TOKEN_BEGIN = 312,
+    TOKEN_END = 313,
+    TOKEN_GOTO = 314,
+    TOKEN_ID = 315,
+    TOKEN_INT = 316,
+    TOKEN_REAL = 317,
+    TOKEN_CHAR = 318,
+    TOKEN_STRING = 319,
+    ERROR = 320,
+    TOKEN_ABS = 321,
+    TOKEN_CHR = 322,
+    TOKEN_ODD = 323,
+    TOKEN_ORD = 324,
+    TOKEN_PRED = 325,
+    TOKEN_SQR = 326,
+    TOKEN_SQRT = 327,
+    TOKEN_SUCC = 328
+  };
 #endif
 /* Tokens.  */
 #define TOKEN_PROGRAM 258
@@ -185,15 +191,16 @@
 #define TOKEN_SQRT 327
 #define TOKEN_SUCC 328
 
-
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef int YYSTYPE;
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
+
 
 extern YYSTYPE yylval;
 
+int yyparse (void);
+
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
