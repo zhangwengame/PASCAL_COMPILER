@@ -16,10 +16,10 @@ void CGExpOp(TreeNode* pnode){
 
 	if (pnode->child[0]!=NULL && pnode->child[1]!=NULL){
 		GenerateCode(pnode->child[0]);
-		CG_OUTPUT("push eax\n");
+		CG_OUTPUT("push %eax\n");
 	
 		GenerateCode(pnode->child[1]);
-		CG_OUTPUT("push eax\n");
+		CG_OUTPUT("push %eax\n");
 
 
 		if ((pnode->child[0])->RuningType != (pnode->child[1])->RuningType){
@@ -34,72 +34,72 @@ void CGExpOp(TreeNode* pnode){
 
 	}
 	else {
-		CG_OUTPUT("push 0\n");
+		CG_OUTPUT("push $0\n");
 		GenerateCode(pnode->child[0]);
-		CG_OUTPUT("push eax\n");
+		CG_OUTPUT("push %eax\n");
 		pnode->RuningType=(pnode->child[0])->RuningType;
 	}
 
 
 
 	if (pnode->RuningType==EXPTYPE_INT){
-		CG_OUTPUT("pop ebx\n");
-		CG_OUTPUT("pop eax\n");
+		CG_OUTPUT("pop %ebx\n");
+		CG_OUTPUT("pop %eax\n");
 		switch(pnode->attr.op)
 		{
 		case TOKEN_PLUS:
-			CG_OUTPUT("add eax, ebx\n");
+			CG_OUTPUT("add %eax, %ebx\n");
 			break;
 		case TOKEN_MINUS:
-			CG_OUTPUT("sub eax, ebx\n");
+			CG_OUTPUT("sub %eax, %ebx\n");
 			break;
 		case TOKEN_MUL:
-			CG_OUTPUT("xor edx, edx\nimul ebx\n");
+			CG_OUTPUT("xor %edx, %edx\nimul %ebx\n");
 			break;
 		case TOKEN_DIV:
-			CG_OUTPUT("xor edx, edx\nidiv ebx\n");
+			CG_OUTPUT("xor %edx, %edx\nidiv %ebx\n");
 			break;
 		case TOKEN_MOD:
-			CG_OUTPUT("xor edx, edx\nidiv ebx\n");
-			CG_OUTPUT("mov eax,edx\n");
+			CG_OUTPUT("xor %edx, %edx\nidiv %ebx\n");
+			CG_OUTPUT("mov %eax,%edx\n");
 			break;
 		case TOKEN_LT:
-			CG_OUTPUT("cmp eax, ebx\n");
-			CG_OUTPUT("mov eax, 0\n");
-			CG_OUTPUT("setl al\n");
+			CG_OUTPUT("cmp %eax, %ebx\n");
+			CG_OUTPUT("mov %eax, $0\n");
+			CG_OUTPUT("setl %al\n");
 			break;
 		case TOKEN_LE:
-			CG_OUTPUT("cmp eax, ebx\n");
-			CG_OUTPUT("mov eax, 0\n");
-			CG_OUTPUT("setng al\n");
+			CG_OUTPUT("cmp %eax, %ebx\n");
+			CG_OUTPUT("mov %eax, $0\n");
+			CG_OUTPUT("setng %al\n");
 			break;
 		case TOKEN_GT:
-			CG_OUTPUT("cmp eax, ebx\n");
-			CG_OUTPUT("mov eax, 0\n");
-			CG_OUTPUT("setg al\n");
+			CG_OUTPUT("cmp %eax, %ebx\n");
+			CG_OUTPUT("mov %eax, $0\n");
+			CG_OUTPUT("setg %al\n");
 			break;
 		case TOKEN_GE:
-			CG_OUTPUT("cmp eax, ebx\n");
-			CG_OUTPUT("mov eax, 0\n");
-			CG_OUTPUT("setnl eax\n");
+			CG_OUTPUT("cmp %eax, %ebx\n");
+			CG_OUTPUT("mov %eax, $0\n");
+			CG_OUTPUT("setnl %eax\n");
 			break;
 		case TOKEN_EQUAL:
-			CG_OUTPUT("cmp eax, ebx\n");
-			CG_OUTPUT("mov eax, 0\n");
-			CG_OUTPUT("sete al\n");
+			CG_OUTPUT("cmp %eax, %ebx\n");
+			CG_OUTPUT("mov %eax, $0\n");
+			CG_OUTPUT("sete %al\n");
 			break;
 		case TOKEN_UNEQUAL:
-			CG_OUTPUT("cmp eax, ebx\n");
-			CG_OUTPUT("mov eax, 0\n");
-			CG_OUTPUT("setne al\n");
+			CG_OUTPUT("cmp %eax, %ebx\n");
+			CG_OUTPUT("mov %eax, $0\n");
+			CG_OUTPUT("setne %al\n");
 			break;
 		}	
 	}
 	else {
-		CG_OUTPUT("fld dword ptr [esp+4]\n");
-		CG_OUTPUT("fld dword ptr [esp]\n");
-		CG_OUTPUT("pop eax\n");
-		CG_OUTPUT("pop eax\n");
+		CG_OUTPUT("fld dword ptr $4(%esp)\n");
+		CG_OUTPUT("fld dword ptr (%esp)\n");
+		CG_OUTPUT("pop %eax\n");
+		CG_OUTPUT("pop %eax\n");
 		switch(pnode->attr.op){
 		case TOKEN_PLUS:
 			CG_OUTPUT("fadd\n");
@@ -129,9 +129,9 @@ void CGExpOp(TreeNode* pnode){
 			CG_OUTPUT("fcom\n");
 			break;
 		}
-		CG_OUTPUT("sub esp,4\n");
-		CG_OUTPUT("fstp dword ptr [esp]\n");
-		CG_OUTPUT("pop eax\n");
+		CG_OUTPUT("sub %esp,$4\n");
+		CG_OUTPUT("fstp dword ptr (%esp)\n");
+		CG_OUTPUT("pop %eax\n");
 		
 	}
 }
@@ -181,18 +181,18 @@ void CGExpId(TreeNode* pnode){
 
 	if (cgtype==EXPTYPE_ARRAY){
 		CGNodeExpression(pnode->child[0]);
-		sprintf(tmp,"mov ebx, %d\n",lower);                 
+		sprintf(tmp,"mov %%ebx, $%d\n",lower);                 
 		CG_OUTPUT(tmp);	
 
-		CG_OUTPUT("sub eax, ebx\n");
-		CG_OUTPUT("mov ebx, 4\n");
-		CG_OUTPUT("imul eax,ebx\n");
-		sprintf(tmp,"mov edi, %d\n",offset);
+		CG_OUTPUT("sub %eax, %ebx\n");
+		CG_OUTPUT("mov %ebx, $4\n");
+		CG_OUTPUT("imul %eax,%ebx\n");
+		sprintf(tmp,"mov %%edi, $%d\n",offset);
 		CG_OUTPUT(tmp);
-		CG_OUTPUT("add edi, eax\n");
+		CG_OUTPUT("add %edi, %eax\n");
 	}
 	else {
-		sprintf(tmp, "mov edi, %d\n", offset);
+		sprintf(tmp, "mov %%edi, $%d\n", offset);
 		CG_OUTPUT(tmp);	
 	}
 
@@ -204,22 +204,22 @@ void CGExpId(TreeNode* pnode){
 		cgtype=st_var.type;	
 	}		
 	//printf("%d\n",cgtype);
-	CG_OUTPUT("mov esi, ecx\n");
+	CG_OUTPUT("mov %esi, %ecx\n");
 	while (level){
-		CG_OUTPUT("mov eax, [esi]\n");
-		CG_OUTPUT("mov esi, eax\n");
+		CG_OUTPUT("mov %eax, (%esi)\n");
+		CG_OUTPUT("mov %esi, %eax\n");
 		level=level-1;
 	}
-	CG_OUTPUT("add esi, edi\n");
+	CG_OUTPUT("add %esi, %edi\n");
 
 
 	if (cgtype==EXPTYPE_INT || cgtype==EXPTYPE_CHAR || cgtype==EXPTYPE_BOOL){
-		CG_OUTPUT("mov eax, [esi]; calculate ExpId \n");
+		CG_OUTPUT("mov %eax, (%esi); calculate ExpId \n");
 		pnode->RuningType=EXPTYPE_INT;
 		//printf("EXPTYPE_INT\n");
 	}
 	else if (cgtype==EXPTYPE_REAL){
-		CG_OUTPUT("mov eax, dword ptr [esi]\n"); 
+		CG_OUTPUT("mov %eax, dword ptr (%esi)\n"); 
 		pnode->RuningType=EXPTYPE_REAL;
 		//printf("EXPTYPE_REAL\n");
 	}
@@ -231,25 +231,25 @@ void CGExpConst(TreeNode* pnode){
 
 	switch (pnode->type){
 		case EXPTYPE_INT:
-			sprintf(tmp, "mov eax, %d; calculate int ExpConst \n", pnode->attr.val);
+			sprintf(tmp, "mov %%eax, $%d; calculate int ExpConst \n", pnode->attr.val);
 			CG_OUTPUT(tmp);
 			pnode->RuningType=EXPTYPE_INT;
 			break;
 		case EXPTYPE_CHAR:
-			sprintf(tmp, "mov eax, %d; calculate char ExpConst \n", pnode->attr.char_val);
+			sprintf(tmp, "mov %%eax, $%d; calculate char ExpConst \n", pnode->attr.char_val);
 			CG_OUTPUT(tmp);
 			pnode->RuningType=EXPTYPE_INT;
 			break;
 		case EXPTYPE_BOOL:
-			sprintf(tmp, "mov eax, %d; calculate bool ExpConst \n", pnode->attr.val);
+			sprintf(tmp, "mov %%eax, $%d; calculate bool ExpConst \n", pnode->attr.val);
 			CG_OUTPUT(tmp);
 			pnode->RuningType=EXPTYPE_INT;
 			break;
 		case EXPTYPE_REAL:
 			strcpy(const_real_data, GetLabel_data());	
-			sprintf(tmp, "%s dd %lf\n",const_real_data, pnode->attr.real_val);
+			sprintf(tmp, "%s dd $%lf\n",const_real_data, pnode->attr.real_val);
 		    CG_OUTPUT_DATA(tmp);
-        	sprintf(tmp,"mov eax, dword ptr[%s]; calculate real ExpConst \n",const_real_data);
+        	sprintf(tmp,"mov %%eax, dword ptr[%s]; calculate real ExpConst \n",const_real_data);
         	CG_OUTPUT(tmp);
         	pnode->RuningType=EXPTYPE_REAL;
 			break;			
@@ -264,10 +264,10 @@ void CGPopParam(TreeNode* pnode,SimpleTypeList judge_var){
 
 	if (judge_var->isVar==1){
 		CGNodeExpression(pnode);
-		CG_OUTPUT("pop eax\n");
-		CG_OUTPUT("mov [esi],eax\n");
+		CG_OUTPUT("pop %eax\n");
+		CG_OUTPUT("mov (%esi),%eax\n");
 	}
-	else CG_OUTPUT("pop eax\n");
+	else CG_OUTPUT("pop %eax\n");
 
 	CGPopParam(pnode->sibling,judge_var->next);
 }
@@ -278,7 +278,7 @@ void CGPushParam(TreeNode* pnode){
 	}
 
 	CGNodeExpression(pnode);
-	CG_OUTPUT("push eax\n");
+	CG_OUTPUT("push %eax\n");
 
 }
 
@@ -286,23 +286,23 @@ void CGExpFunc(TreeNode* pnode){
 
 	FuncList judge_var=funcListLookup(pnode->attr.name);
 
-	CG_OUTPUT("push eax\n");  // push return value	
+	CG_OUTPUT("push %eax\n");  // push return value	
 
 	CGPushParam(pnode->child[0]);
 
 
-	CG_OUTPUT("push ecx\n");  // save access link
-	CG_OUTPUT("mov ecx, esp\n");
+	CG_OUTPUT("push %ecx\n");  // save access link
+	CG_OUTPUT("mov %ecx, %esp\n");
 
 	sprintf(tmp, "call %s\n", pnode->attr.name);
 	CG_OUTPUT(tmp);
 
-	CG_OUTPUT("pop ecx\n");
+	CG_OUTPUT("pop %ecx\n");
 
 
 	CGPopParam(pnode->child[0],judge_var->paraList);
 
-	CG_OUTPUT("pop eax\n");  // pop return value
+	CG_OUTPUT("pop %eax\n");  // pop return value
 
 }
 
@@ -314,13 +314,13 @@ void CGStmtProc(TreeNode* pnode){
 	CGPushParam(pnode->child[0]);
 
 
-	CG_OUTPUT("push ecx\n");  // save access link
-	CG_OUTPUT("mov ecx, esp\n");
+	CG_OUTPUT("push %ecx\n");  // save access link
+	CG_OUTPUT("mov %ecx, %esp\n");
 
 	sprintf(tmp, "call %s\n", pnode->attr.name);
 	CG_OUTPUT(tmp);
 
-	CG_OUTPUT("pop ecx\n");
+	CG_OUTPUT("pop %ecx\n");
 
 	CGPopParam(pnode->child[0],judge_var->paraList);
 }
@@ -332,30 +332,30 @@ void CGStmtAssign(TreeNode* pnode){
 
 	//if  (pnode->attr.op==TOKEN_ID){   // x:=1;
 		GenerateCode(pnode->child[1]);
-		CG_OUTPUT("push eax\n");
+		CG_OUTPUT("push %eax\n");
 		VariableList ssvar=varListLookup((pnode->child[0])->attr.name);
 		if (ssvar->isConst){		
  			printf("Line %d, Error: The const variable %s can not be assigned.\n",pnode->lineno,(pnode->child[0])->attr.name);
  			fflush(stdout);	
 		}
 		GenerateCode(pnode->child[0]);
-		CG_OUTPUT("pop eax\n");
-		CG_OUTPUT("mov [esi-0], eax; assign\n");
+		CG_OUTPUT("pop %eax\n");
+		CG_OUTPUT("mov $-0(%esi), %eax; assign\n");
 	/*}
 	else if (pnode->attr.op==TOKEN_ARRAY){ //x[1]:=1
 		GenerateCode(pnode->child[2]);
-		CG_OUTPUT("push eax\n");
+		CG_OUTPUT("push %eax\n");
 
 		GenerateCode(pnode->child[1]);
-		CG_OUTPUT("push eax\n");
+		CG_OUTPUT("push %eax\n");
 		GenerateCode(pnode->child[0]);
-		CG_OUTPUT("pop eax\n");
-		CG_OUTPUT("mov ebx,4\n");  //int = 4  
-		CG_OUTPUT("xor edx, edx\nimul ebx\n");
-		CG_OUTPUT("add esi,eax\n");
+		CG_OUTPUT("pop %eax\n");
+		CG_OUTPUT("mov %ebx,$4\n");  //int = 4  
+		CG_OUTPUT("xor %edx, %edx\nimul %ebx\n");
+		CG_OUTPUT("add %esi,%eax\n");
 
-		CG_OUTPUT("pop eax\n");
-		CG_OUTPUT("mov [esi-0], eax; assign\n");		
+		CG_OUTPUT("pop %eax\n");
+		CG_OUTPUT("mov $-0(%esi), %eax; assign\n");		
 
 
 	}
@@ -420,7 +420,7 @@ void CGStmtCase(TreeNode* pnode){
 	strcpy(case_end, GetLabel());	
 
 	GenerateCode(pnode->child[0]);
-	CG_OUTPUT("push eax\n");
+	CG_OUTPUT("push %eax\n");
 	GenerateCode(pnode->child[1]);
 
 }
@@ -432,8 +432,8 @@ void CGExpCase(TreeNode* pnode){
 
 	GenerateCode(pnode->child[0]);
 	
-	CG_OUTPUT("pop ebx\n");
-	CG_OUTPUT("cmp ebx,eax\n");
+	CG_OUTPUT("pop %ebx\n");
+	CG_OUTPUT("cmp %ebx,%eax\n");
 
 	sprintf(tmp, "jne %s\n", case_end);  //unequal
 	CG_OUTPUT(tmp);
@@ -443,7 +443,7 @@ void CGExpCase(TreeNode* pnode){
 	sprintf(tmp, "%s:\n", case_end);
 	CG_OUTPUT(tmp);
 	if (pnode->sibling!=NULL)
-		CG_OUTPUT("push ebx\n");
+		CG_OUTPUT("push %ebx\n");
 }
 
 void CGStmtWhile(TreeNode* pnode){
@@ -457,7 +457,7 @@ void CGStmtWhile(TreeNode* pnode){
 
 	GenerateCode(pnode->child[0]);
 
-	CG_OUTPUT("cmp eax, 0\n");
+	CG_OUTPUT("cmp %eax, $0\n");
 	sprintf(tmp,"je %s\n",while_end);
 	CG_OUTPUT(tmp);
 
@@ -479,7 +479,7 @@ void CGStmtRepeat(TreeNode* pnode){
 	GenerateCode(pnode->child[0]);
 	GenerateCode(pnode->child[1]);
 
-	CG_OUTPUT("cmp eax, 0\n");
+	CG_OUTPUT("cmp %eax, $0\n");
 	sprintf(tmp,"je %s\n",repeat_start);
 	CG_OUTPUT(tmp);
 	
@@ -497,11 +497,11 @@ void CGStmtFor(TreeNode* pnode){
 
 	//chuzhi
 	GenerateCode(pnode->child[1]);
-	CG_OUTPUT("push eax\n");
+	CG_OUTPUT("push %eax\n");
 	GenerateCode(pnode->child[0]);
-	CG_OUTPUT("pop eax\n");
-	//CG_OUTPUT("add esi, ecx\n");
-	CG_OUTPUT("mov [esi-0],eax  \n");
+	CG_OUTPUT("pop %eax\n");
+	//CG_OUTPUT("add %esi, %ecx\n");
+	CG_OUTPUT("mov $-0(%esi),%eax  \n");
 
 	
 	//xunhuan
@@ -509,18 +509,18 @@ void CGStmtFor(TreeNode* pnode){
 		sprintf(tmp,"%s:\n",for_start);
 		CG_OUTPUT(tmp);	
 		GenerateCode(pnode->child[2]);
-		CG_OUTPUT("push eax\n");
+		CG_OUTPUT("push %eax\n");
 		GenerateCode(pnode->child[0]);
-		CG_OUTPUT("pop ebx\n");	
-		CG_OUTPUT("cmp eax, ebx\n");
+		CG_OUTPUT("pop %ebx\n");	
+		CG_OUTPUT("cmp %eax, %ebx\n");
 		sprintf(tmp, "ja %s\n", for_end);
 		CG_OUTPUT(tmp);	
 
 		GenerateCode(pnode->child[3]);	
 
 		GenerateCode(pnode->child[0]);
-		CG_OUTPUT("inc eax\n");
-		CG_OUTPUT("mov [esi-0],eax\n");	
+		CG_OUTPUT("inc %eax\n");
+		CG_OUTPUT("mov $-0(%esi),%eax\n");	
 
 		sprintf(tmp,"jmp %s\n",for_start);
 		CG_OUTPUT(tmp);	
@@ -531,18 +531,18 @@ void CGStmtFor(TreeNode* pnode){
 		sprintf(tmp,"%s:\n",for_start);
 		CG_OUTPUT(tmp);	
 		GenerateCode(pnode->child[2]);
-		CG_OUTPUT("push eax\n");
+		CG_OUTPUT("push %eax\n");
 		GenerateCode(pnode->child[0]);
-		CG_OUTPUT("pop ebx\n");	
-		CG_OUTPUT("cmp eax, ebx\n");
+		CG_OUTPUT("pop %ebx\n");	
+		CG_OUTPUT("cmp %eax, %ebx\n");
 		sprintf(tmp, "jb %s\n", for_end);
 		CG_OUTPUT(tmp);	
 
 		GenerateCode(pnode->child[3]);	
 
 		GenerateCode(pnode->child[0]);
-		CG_OUTPUT("dec eax\n");
-		CG_OUTPUT("mov [esi-0],eax\n");	
+		CG_OUTPUT("dec %eax\n");
+		CG_OUTPUT("mov $-0(%esi),%eax\n");	
 		
 		sprintf(tmp,"jmp %s\n",for_start);
 		CG_OUTPUT(tmp);	
@@ -561,7 +561,7 @@ void CGStmtIf(TreeNode* pnode){
 	
 	//panduan
 	GenerateCode(pnode->child[0]);
-	CG_OUTPUT("cmp eax, 1\n");	
+	CG_OUTPUT("cmp %eax, $1\n");	
 	sprintf(tmp, "je %s \njmp %s\n", if_label, else_label);
 	CG_OUTPUT(tmp);	
 	
@@ -596,10 +596,10 @@ void GStmtOutput(TreeNode* pnode){
 
 		if (tt->RuningType==EXPTYPE_REAL){
 			CG_OUTPUT("pusha\n");
-			CG_OUTPUT("push eax\n");
-			CG_OUTPUT("fld dword ptr [esp]\n");
-			CG_OUTPUT("sub esp, 4\n");
-			CG_OUTPUT("fstp qword ptr [esp]\n");
+			CG_OUTPUT("push %eax\n");
+			CG_OUTPUT("fld dword ptr (%esp)\n");
+			CG_OUTPUT("sub %esp, $4\n");
+			CG_OUTPUT("fstp qword ptr (%esp)\n");
 			if  (pnode->attr.op==TOKEN_WRITELN){
 				CG_OUTPUT("push offset lb_writeln_real\n");
 			}
@@ -607,17 +607,17 @@ void GStmtOutput(TreeNode* pnode){
 				CG_OUTPUT("push offset lb_write_real\n");
 			}
 			CG_OUTPUT("call printf\n");
-			CG_OUTPUT("add esp, 8\n");
-			CG_OUTPUT("pop eax\n");
+			CG_OUTPUT("add %esp, $8\n");
+			CG_OUTPUT("pop %eax\n");
 			CG_OUTPUT("popa\n");
 		}
 		else if (tt->RuningType==EXPTYPE_INT){
 			CG_OUTPUT("pusha\n");
 			if  (pnode->attr.op==TOKEN_WRITELN){
-				CG_OUTPUT("invoke printf,offset lb_writeln_int, eax\n");
+				CG_OUTPUT("invoke printf,offset lb_writeln_int, %eax\n");
 			}
 			else{
-				CG_OUTPUT("invoke printf,offset lb_write_int, eax\n");
+				CG_OUTPUT("invoke printf,offset lb_write_int, %eax\n");
 			}
 			CG_OUTPUT("popa\n");
 		}
@@ -652,8 +652,8 @@ void GStmtInput(TreeNode* pnode){
 		CG_OUTPUT("pusha\n");
 		CG_OUTPUT(output_all);
 		CG_OUTPUT("popa\n");
-		CG_OUTPUT("mov eax, dword ptr lb_tmp\n");
-		CG_OUTPUT("mov [esi], eax\n");
+		CG_OUTPUT("mov %eax, dword ptr lb_tmp\n");
+		CG_OUTPUT("mov (%esi), %eax\n");
 		tt=tt->sibling;
 	}
 	
@@ -762,10 +762,10 @@ void GenerateCode(TreeNode* pnode){
 					}
 					else {
 						CG_OUTPUT("main PROC\n");
-						CG_OUTPUT("mov ecx, esp\n");
+						CG_OUTPUT("mov %ecx, %esp\n");
 					}
 
-  					sprintf(tmp, "sub esp, %d\n", size_param);
+  					sprintf(tmp, "sub %%esp, %d\n", size_param);
   					CG_OUTPUT(tmp);		
 
 
@@ -782,7 +782,7 @@ void GenerateCode(TreeNode* pnode){
 	
 					
 					size_param=leaveScope();
-					sprintf(tmp, "add esp, %d\n", size_param);
+					sprintf(tmp, "add %%esp, $%d\n", size_param);
   					CG_OUTPUT(tmp);	
 					CG_OUTPUT("ret\n");	
 
@@ -798,7 +798,7 @@ void GenerateCode(TreeNode* pnode){
 					GenerateCode(pnode->child[1]); //routine_head 
 				
 					size_param=leaveScope();
-					sprintf(tmp, "add esp, %d\n", size_param);
+					sprintf(tmp, "add %%esp, $%d\n", size_param);
   					CG_OUTPUT(tmp);	
 					CG_OUTPUT("ret\n");	
 
@@ -854,7 +854,7 @@ CG_OUTPUT("main:\n");
 	
 
 	size_param=leaveScope();  //li kai zhu yu shi
-	sprintf(tmp, "add esp, %d\n", size_param);
+	sprintf(tmp, "add %%esp, $%d\n", size_param);
   	CG_OUTPUT(tmp);	
 	CG_OUTPUT("main ENDP\n");
 	CG_OUTPUT("END main\n");
