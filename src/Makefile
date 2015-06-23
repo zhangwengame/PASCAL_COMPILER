@@ -18,3 +18,6 @@ clean:
 	rm lex.yy.c
 	rm compiler
 	rm test.o
+	rm out.s
+	rm data_part.asm
+	rm code_part.asm
