@@ -96,41 +96,79 @@ void CGExpOp(TreeNode* pnode){
 		}	
 	}
 	else {
-		CG_OUTPUT("fldl $4(%esp)\n");
-		CG_OUTPUT("fldl (%esp)\n");
-		CG_OUTPUT("popl %eax\n");
-		CG_OUTPUT("popl %eax\n");
+		// CG_OUTPUT("flds (%esp)\n");		
+		// to be decided
+		
+		// switch(pnode->attr.op){
+		// 	case TOKEN_PLUS:
+		// 		CG_OUTPUT("fadds 4(%esp)\n");
+		// 		break;
+		// 	case TOKEN_MINUS:
+		// 		CG_OUTPUT("fsubs 4(%esp)\n");
+		// 		break;
+		// 	case TOKEN_MUL:				
+		// 		CG_OUTPUT("fmuls 4(%esp)\n");
+		// 		break;
+		// 	case TOKEN_DIV:
+		// 		CG_OUTPUT("fdivs 4(%esp)\n");
+		// 		break;
+		// 	case TOKEN_LT:
+		// 	case TOKEN_LE: 
+		// 	case TOKEN_GT: 
+		// 	case TOKEN_GE:
+		// 	case TOKEN_EQUAL:
+		// 		CG_OUTPUT("flds 4(%esp)\n");
+		// 		CG_OUTPUT("fcom\n");			
+		// 		break;
+		// }
+
+		
 		switch(pnode->attr.op){
-		case TOKEN_PLUS:
-			CG_OUTPUT("fadd\n");
-			break;
-		case TOKEN_MINUS:
-			CG_OUTPUT("fsub\n");
-			break;
-		case TOKEN_MUL:
-			CG_OUTPUT("fmul\n");
-			break;
-		case TOKEN_DIV:
-			CG_OUTPUT("fdiv\n");
-			break;
-		case TOKEN_LT:
-			CG_OUTPUT("fcom\n");
-			break;
-		case TOKEN_LE:
-			CG_OUTPUT("fcom\n");
-			break;
-		case TOKEN_GT:
-			CG_OUTPUT("fcom\n");
-			break;
-		case TOKEN_GE:
-			CG_OUTPUT("fcom\n");
-			break;
-		case TOKEN_EQUAL:
-			CG_OUTPUT("fcom\n");
-			break;
+			case TOKEN_PLUS:
+				CG_OUTPUT("flds 4(%esp)\n");
+				CG_OUTPUT("flds (%esp)\n");		
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("faddp\n");
+				break;
+			case TOKEN_MINUS:				
+				CG_OUTPUT("flds (%esp)\n");	
+				CG_OUTPUT("flds 4(%esp)\n");
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("fsubp\n");
+				break;
+			case TOKEN_MUL:
+				CG_OUTPUT("flds (%esp)\n");	
+				CG_OUTPUT("flds 4(%esp)\n");
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("fmulp\n");
+				break;
+			case TOKEN_DIV:
+				CG_OUTPUT("flds (%esp)\n");	
+				CG_OUTPUT("flds 4(%esp)\n");
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("fdivp\n");
+				break;
+			case TOKEN_LT:
+			case TOKEN_LE:
+			case TOKEN_GT:
+			case TOKEN_GE:
+			case TOKEN_EQUAL:
+				CG_OUTPUT("flds 4(%esp)\n");
+				CG_OUTPUT("flds (%esp)\n");		
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("popl %eax\n");
+				CG_OUTPUT("fcom\n");
+				break;
 		}
+		
+		// CG_OUTPUT("popl %eax\n");
+		// CG_OUTPUT("popl %eax\n");
 		CG_OUTPUT("subl $4, %esp\n");
-		CG_OUTPUT("fstpll (%esp)\n");
+		CG_OUTPUT("fstps (%esp)\n");
 		CG_OUTPUT("popl %eax\n");
 		
 	}
@@ -232,7 +270,7 @@ void CGExpConst(TreeNode* pnode){
 	switch (pnode->type){
 		case EXPTYPE_INT:
 			sprintf(tmp, "movl $%d, %%eax\t# calculate int ExpConst \n", pnode->attr.val);
-			CG_OUTPUT(tmp);
+			CG_OUTPUT(tmp);		
 			pnode->RuningType=EXPTYPE_INT;
 			break;
 		case EXPTYPE_CHAR:
@@ -247,10 +285,11 @@ void CGExpConst(TreeNode* pnode){
 			break;
 		case EXPTYPE_REAL:
 			strcpy(const_real_data, GetLabel_data());	
-			sprintf(tmp, "%s:\n\t.float %lf\n",const_real_data, pnode->attr.real_val);							// UNDONE
+			sprintf(tmp, ".%s:\n\t.float %lf\n",const_real_data, pnode->attr.real_val);							// UNDONE
 		    CG_OUTPUT_DATA(tmp);
-        	sprintf(tmp,"movl $%s, %%eax\t# calculate real ExpConst \n",const_real_data); 	// UNDONE
+        	sprintf(tmp,"movl $.%s, %%ebx\t# calculate real ExpConst \n",const_real_data); 	// UNDONE
         	CG_OUTPUT(tmp);
+        	CG_OUTPUT("movl (%ebx), %eax\n");			// Make const pointer the const value
         	pnode->RuningType=EXPTYPE_REAL;
 			break;			
 	}
@@ -597,7 +636,8 @@ void GStmtOutput(TreeNode* pnode){
 		if (tt->RuningType==EXPTYPE_REAL){
 			CG_OUTPUT("pusha\n");
 			CG_OUTPUT("pushl %eax\n");
-			CG_OUTPUT("flds (%eax)\n");
+			// CG_OUTPUT("flds (%eax)\n");
+			CG_OUTPUT("flds (%esp)\n");				// make the original
 			CG_OUTPUT("subl $4, %esp\n");
 			CG_OUTPUT("fstpl (%esp)\n");
 			if  (pnode->attr.op==TOKEN_WRITELN){
@@ -615,14 +655,14 @@ void GStmtOutput(TreeNode* pnode){
 			CG_OUTPUT("pusha\n");
 			if  (pnode->attr.op==TOKEN_WRITELN){
 				CG_OUTPUT("pushl %eax\n");
-				CG_OUTPUT("pushl $.PRINTF_U_N\n");
+				CG_OUTPUT("pushl $.PRINTF_I_N\n");
 				CG_OUTPUT("call printf\n");
 				CG_OUTPUT("addl $8, %esp\n");				
 				// CG_OUTPUT("invoke printf,offset lb_writeln_int, %eax\n");
 			}
 			else{
 				CG_OUTPUT("pushl %eax\n");
-				CG_OUTPUT("pushl $.PRINTF_U\n");
+				CG_OUTPUT("pushl $.PRINTF_I\n");
 				CG_OUTPUT("call printf\n");
 				CG_OUTPUT("addl $8, %esp\n");	
 				// CG_OUTPUT("invoke printf,offset lb_write_int, %eax\n");
@@ -851,10 +891,10 @@ CG_OUTPUT("main:\n");
 	// CG_OUTPUT_DATA("printf  proto C:dword,:dword\n");
 
 	// CG_OUTPUT_DATA(".data\n");
-	CG_OUTPUT_DATA(".PRINTF_U:\n");
-	CG_OUTPUT_DATA("\t.string \"%u\"\n");
-	CG_OUTPUT_DATA(".PRINTF_U_N:\n");
-	CG_OUTPUT_DATA("\t.string \"%u\\n\"\n");
+	CG_OUTPUT_DATA(".PRINTF_I:\n");
+	CG_OUTPUT_DATA("\t.string \"%i\"\n");
+	CG_OUTPUT_DATA(".PRINTF_I_N:\n");
+	CG_OUTPUT_DATA("\t.string \"%i\\n\"\n");
 	CG_OUTPUT_DATA(".PRINTF_F:\n");
 	CG_OUTPUT_DATA("\t.string \"%f\"\n");
 	CG_OUTPUT_DATA(".PRINTF_F_N:\n");
