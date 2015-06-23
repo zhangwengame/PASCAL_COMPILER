@@ -3,8 +3,14 @@
 .PRINTF_U_N:
 	.string "%u\n"
 .PRINTF_F:
-	.string "%lf"
+	.string "%f"
 .PRINTF_F_N:
-	.string "%lf\n"
+	.string "%f\n"
 _REALNUM0:
-	.double 1.200000
+	.float 0.200000
+_REALNUM1:
+	.float 0.300000
+_REALNUM2:
+	.float 0.001000
+_REALNUM3:
+	.float 0.100000
