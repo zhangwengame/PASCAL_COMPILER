@@ -19,8 +19,8 @@ src/ $ make test
 
 ### NOTE
 
-Note that current version failed to pass the test of `record` and `calculator`.
+Note that current version failed to pass the last test of  `calculator`. The output is incorrect when involved in `float compare`.
 
-The major reason is the operation over `float/double` is not correctly implemented.
+The major reason is the `fcom` instruction over `float compare` is not correctly implemented.
 
 AT&T style assembly code about fpu is in need. 

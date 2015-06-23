@@ -5,7 +5,7 @@ function ff(u:integer):integer;
 var x:integer;
 begin
   x:=2;
-  ff:=x+u;
+  ff:=x*u;
 end;
 
 begin
