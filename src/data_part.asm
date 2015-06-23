@@ -7,4 +7,10 @@
 .PRINTF_F_N:
 	.string "%lf\n"
 _REALNUM0:
-	.double 1.200000
+	.double 0.200000
+_REALNUM1:
+	.double 0.300000
+_REALNUM2:
+	.double 0.001000
+_REALNUM3:
+	.double 0.100000
