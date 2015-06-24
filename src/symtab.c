@@ -51,7 +51,34 @@ static ProcList procHashTable[SIZE];
 /*record the total offset of each scope*/
 static int totalOffset[50];
 
-
+void ErrorHandler(int errortype, TreeNode * pnode){
+	switch (errortype){
+		case ERROR_TYPE_MISMATCH:
+			printf("Line %d, Error: Different data type can not be calculated.\n",pnode->lineno);
+ 			fflush(stdout);	
+			break;
+		case ERROR_VAR_MISS:
+			printf("Line %d, Error: The variable %s is not existed.\n",pnode->lineno,pnode->attr.name);
+ 			fflush(stdout);
+			break;
+		case ERROR_VAR_NOTARRAY:
+			printf("Line %d, Error: The variable %s is not an array.\n",pnode->lineno,pnode->attr.name);
+ 			fflush(stdout);
+			break;
+		case ERROR_VAR_MODIFYCONST:
+			printf("Line %d, Error: The const variable %s can not be assigned.\n",pnode->lineno,(pnode->child[0])->attr.name);
+ 			fflush(stdout);	
+			break;
+		case ERROR_VAR_REDEC:
+			printf("Line %d, Error: redeclaration of variable: %s.\n",pnode->lineno,pnode->attr.name);
+ 			fflush(stdout);	
+			break;
+		case ERROR_FUNC_REDEC:
+			printf("Line %d, Error: redeclaration of function: %s.\n",pnode->lineno,pnode->attr.name);
+ 			fflush(stdout);	
+			break;
+	}
+}
 
 /*=========================定义对符号表的插入操作=================================*/
 
@@ -178,7 +205,7 @@ int procListInsert(TreeNode* procHead) {
 			paraList = newSimpleTypeList(procHead->child[0]->child[0]->attr.name, procHead->child[0]->child[1]->type, False);
 		}
 
-		varListInsert(procHead->child[0]->child[0]->attr.name, procHead->child[0]->child[1]->type, False, paraNestLevel, NULL, procHead->lineno, 0, offset);
+		varListInsert(procHead, procHead->child[0]->child[0]->attr.name, procHead->child[0]->child[1]->type, False, paraNestLevel, NULL, procHead->lineno, 0, offset);
 		offset = offset + PARA_OFFSET_INC;
 
 		tmpNode = procHead->child[0]->sibling;
@@ -189,7 +216,7 @@ int procListInsert(TreeNode* procHead) {
 			else
 				tmpList = insertSimpleTypeList(tmpList, tmpNode->child[0]->attr.name, tmpNode->child[1]->type, False);
 
-			varListInsert(tmpNode->child[0]->attr.name, tmpNode->child[1]->type, False, paraNestLevel, NULL, tmpNode->lineno, 0, offset);
+			varListInsert(tmpNode, tmpNode->child[0]->attr.name, tmpNode->child[1]->type, False, paraNestLevel, NULL, tmpNode->lineno, 0, offset);
 			offset = offset + PARA_OFFSET_INC;
 			
 			tmpNode = tmpNode->sibling;
@@ -231,13 +258,11 @@ int funcListInsert(TreeNode* funcHead) {
 		paraList = NULL;
 	else {
 	   	if(funcHead->child[0]->kind == DECL_VAR_PARA&0xF) {
-			//若传递参数为实参
 			paraList = newSimpleTypeList(funcHead->child[0]->child[0]->attr.name, funcHead->child[0]->child[1]->type, True);
 		} else {
-			//若传递参数为形参
 			paraList = newSimpleTypeList(funcHead->child[0]->child[0]->attr.name, funcHead->child[0]->child[1]->type, False);
 		}
-		varListInsert(funcHead->child[0]->child[0]->attr.name,funcHead->child[0]->child[1]->type, False, paraNestLevel, NULL, funcHead->lineno, 0, offset);
+		varListInsert(funcHead->child[0]->child[0], funcHead->child[0]->child[0]->attr.name,funcHead->child[0]->child[1]->type, False, paraNestLevel, NULL, funcHead->lineno, 0, offset);
 		offset = offset + PARA_OFFSET_INC;
 
 		tmpNode = funcHead->child[0]->sibling;
@@ -248,7 +273,7 @@ int funcListInsert(TreeNode* funcHead) {
 			else
 				tmpList = insertSimpleTypeList(tmpList, tmpNode->child[0]->attr.name, tmpNode->child[1]->type, False);
 
-			varListInsert(tmpNode->child[0]->attr.name, tmpNode->child[1]->type, False, paraNestLevel, NULL, tmpNode->lineno, 0, offset);
+			varListInsert(tmpNode->child[0], tmpNode->child[0]->attr.name, tmpNode->child[1]->type, False, paraNestLevel, NULL, tmpNode->lineno, 0, offset);
 			offset = offset + PARA_OFFSET_INC;
 			
 			tmpNode = tmpNode->sibling;
@@ -256,7 +281,7 @@ int funcListInsert(TreeNode* funcHead) {
 	}
 
 	//符号表插入返回值,与函数同名
-	varListInsert(funcHead->attr.name, retType, False, paraNestLevel, NULL, funcHead->lineno, 0, offset);
+	varListInsert(funcHead, funcHead->attr.name, retType, False, paraNestLevel, NULL, funcHead->lineno, 0, offset);
 	offset = offset + PARA_OFFSET_INC;
 
 	int h = hash(name);
@@ -273,6 +298,7 @@ int funcListInsert(TreeNode* funcHead) {
 		tmp->next = (l == NULL)? NULL:l;
 		funcHashTable[h] = tmp;
 	}
+	else ErrorHandler(ERROR_FUNC_REDEC, funcHead);
 
 	return offset;
 }
@@ -315,7 +341,7 @@ void typeListInsert(char* name, ExpType type, int nestLevel, void* pAttr, int si
 }
 
 /*insert line numbers and memory location into the variable hash table*/
-void varListInsert(char* name, ExpType type, int isConst, int nestLevel, void* pAttr, int lineno, int baseLoc, int offset) { 
+void varListInsert(TreeNode* t, char* name, ExpType type, int isConst, int nestLevel, void* pAttr, int lineno, int baseLoc, int offset) { 
 	int h = hash(name);
 	VariableList l = variableHashTable[h];
 	VariableList tmp = l;
@@ -336,12 +362,13 @@ void varListInsert(char* name, ExpType type, int isConst, int nestLevel, void* p
 		tmp->next = (l == NULL)? NULL:l;
 		variableHashTable[h] = tmp;
 	} else { /*find the exact variable*/
-		LineList t = tmp->lines;
+		/*LineList t = tmp->lines;
 		while(t->next != NULL)
 			t = t->next;
 		t->next = (LineList) malloc(sizeof(struct LineListRec));
 		t->next->lineno = lineno;
-		t->next->next = NULL;
+		t->next->next = NULL;*/
+		ErrorHandler(ERROR_VAR_REDEC, t);
 	}
 }
 
@@ -517,8 +544,8 @@ int leaveScope() {
 /*print symbol table*/
 void printSymTab(FILE* listing) {
 	int i;
-	fprintf(listing, "Variable Name		NestLevel 	Location 	Line Number\n");
-	fprintf(listing, "------------- 	---------	-------- 	-----------\n");
+	fprintf(listing, "Variable Name	| NestLevel | Line Number\n");
+	fprintf(listing, ":\n");
 	for(i=0; i<SIZE; i++) {
 		if(variableHashTable[i] != NULL) {
 			VariableList l = variableHashTable[i];
@@ -526,7 +553,7 @@ void printSymTab(FILE* listing) {
 				LineList t = l->lines;
 				fprintf(listing, "%-14s ", l->name);
 				fprintf(listing, "%-8d", l->nestLevel);
-				fprintf(listing, "%-8d ", l->memloc.offset);
+				//fprintf(listing, "%-8d ", l->memloc.offset);
 				while(t != NULL) {
 					fprintf(listing, "%4d ", t->lineno);
 					t = t->next;
@@ -537,8 +564,8 @@ void printSymTab(FILE* listing) {
 		}
 	}
 
-	fprintf(listing, "Function Name		NestLevel 	Return Type 	Parameter\n");
-	fprintf(listing, "------------- 	---------	-------- 	-----------\n");
+	fprintf(listing, "Function Name	| NestLevel | Return Type | Parameter\n");
+	fprintf(listing, ": \n");
 	for(i=0; i<SIZE; i++) {
 		if(funcHashTable[i] != NULL) {
 			FuncList l = funcHashTable[i];

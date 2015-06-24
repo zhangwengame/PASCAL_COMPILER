@@ -82,6 +82,14 @@ typedef enum{
 #define TYPE_SIMPLE_LIMIT 0x44
 #define TYPE_ARRAY 0x45
 #define TYPE_RECORD 0x46
+
+// Defination of error type
+#define ERROR_TYPE_MISMATCH 0
+#define ERROR_VAR_MISS 1
+#define ERROR_VAR_NOTARRAY 2
+#define ERROR_VAR_MODIFYCONST 3
+#define ERROR_VAR_REDEC 4
+#define ERROR_FUNC_REDEC 5
 /*
 #define EXPTYPE_VOID 0x51
 #define EXPTYPE_INT 0x52

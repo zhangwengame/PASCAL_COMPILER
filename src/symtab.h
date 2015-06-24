@@ -113,7 +113,7 @@ typedef struct ProcListRec {
 	struct ProcListRec* next; 
 }* ProcList;
 
-
+void ErrorHandler(int errortype, TreeNode * pnode);
 static int hash (char* key);
 SubBoundDef newSubBoundDef(ExpType type, void* upper, void* lower);
 ArrayDef newArrayDef(ExpType arrayType, ExpType boundType, void* upper, void* lower);
@@ -130,7 +130,7 @@ int procListInsert(TreeNode* procHead);
 int funcListInsert(TreeNode* funcHead);
 void typeListAliaseInsert(char* name, char* aliase);
 void typeListInsert(char* name, ExpType type, int nestLevel, void* pAttr, int size);
-void varListInsert(char* name, ExpType type, int isConst, int nestLevel, void* pAttr, int lineno, int baseLoc, int offset);
+void varListInsert(TreeNode * t, char* name, ExpType type, int isConst, int nestLevel, void* pAttr, int lineno, int baseLoc, int offset);
 
 
 VariableList varListLookup(char* name);
