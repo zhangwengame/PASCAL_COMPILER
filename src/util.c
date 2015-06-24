@@ -115,60 +115,6 @@ void printToken(TokenType token, const char * tokenString){
     }
 }
 
-TreeNode * newDeclNode(int kind){
-    /*TreeNode * t = (TreeNode *)malloc(sizeof(TreeNode));
-    int i;
-    if(t==NULL)
-      fprintf(listing,"Out of memory error at line %d\n",lineno);
-    else{
-        for(i=0;i<MAXCHILDREN;i++)
-          t->child[i]=NULL;
-        t->sibling=NULL;
-        t->nodekind=NODE_DECLARE;  
-        t->kind.decl = kind;
-        t->lineno=lineno;
-    }
-    return t;*/
-    return newNode(kind);
-}
-
-
-TreeNode * newStmtNode(int kind){
-    /*TreeNode * t = (TreeNode *)malloc(sizeof(TreeNode));
-    int i;
-    if(t==NULL)
-      fprintf(listing,"Out of memory error at line %d\n",lineno);
-    else{
-        for(i=0;i<MAXCHILDREN;i++)
-          t->child[i]=NULL;
-        t->sibling=NULL;
-        t->nodekind=NODE_STATEMENT;
-        t->kind.stmt=kind;
-        t->lineno=lineno;
-    }
-    return t;*/
-    return newNode(kind);
-}
-
-
-TreeNode * newExpNode(int kind){
-    /*TreeNode * t = (TreeNode *)malloc(sizeof(TreeNode));
-    int i;
-    if(t==NULL)
-      fprintf(listing,"Out of memory error at line %d\n",lineno);
-    else{
-        for(i=0;i<MAXCHILDREN;i++)
-          t->child[i]=NULL;
-        t->sibling=NULL;
-        t->nodekind=NODE_EXPRESSION;
-        t->kind.exp=kind;
-        t->lineno=lineno;
-        t->type = EXPTYPE_VOID;
-    }
-    return t;*/
-    return newNode(kind);
-}
-    
 TreeNode * newOpExpNode(TreeNode * first, TreeNode * second, TokenType op){
     TreeNode * t = (TreeNode *)malloc(sizeof(TreeNode));
     int i;
@@ -189,22 +135,6 @@ TreeNode * newOpExpNode(TreeNode * first, TreeNode * second, TokenType op){
 
 }
 
-TreeNode * newTypeNode(int kind){
-    /*TreeNode * t = (TreeNode *)malloc(sizeof(TreeNode));
-    int i;
-    if(t==NULL)
-      fprintf(listing,"Out of memory error at line %d\n",lineno);
-    else{
-        for(i=0;i<MAXCHILDREN;i++)
-          t->child[i]=NULL;
-        t->sibling=NULL;
-        t->nodekind=NODE_TYPE;   
-        t->kind.type=type;
-        t->lineno=lineno;
-    }
-    return t;*/
-    return newNode(kind);
-}
 
 TreeNode * newFuncSysExpNode(TokenType op, TreeNode* args){
     TreeNode * t = (TreeNode *)malloc(sizeof(TreeNode));
