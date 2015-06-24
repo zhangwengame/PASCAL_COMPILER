@@ -19,8 +19,10 @@ src/ $ make test
 
 ### NOTE
 
-Note that current version failed to pass the last test of  `calculator`. The output is incorrect when involved in `float compare`.
+The backend can run successfully on linux32 machines with att style assembly. 
 
-The major reason is the `fcom` instruction over `float compare` is not correctly implemented.
+To run it on 64-bit machines, modify the Makefile to add `-m32` option after `gcc` command as:
 
-AT&T style assembly code about fpu is in need. 
+``` sh
+$ gcc -m32 -o test.o out.s
+```
