@@ -98,78 +98,84 @@ void CGExpOp(TreeNode* pnode){
 	else {
 		// CG_OUTPUT("flds (%esp)\n");		
 		// to be decided
-		
-		// switch(pnode->attr.op){
-		// 	case TOKEN_PLUS:
-		// 		CG_OUTPUT("fadds 4(%esp)\n");
-		// 		break;
-		// 	case TOKEN_MINUS:
-		// 		CG_OUTPUT("fsubs 4(%esp)\n");
-		// 		break;
-		// 	case TOKEN_MUL:				
-		// 		CG_OUTPUT("fmuls 4(%esp)\n");
-		// 		break;
-		// 	case TOKEN_DIV:
-		// 		CG_OUTPUT("fdivs 4(%esp)\n");
-		// 		break;
-		// 	case TOKEN_LT:
-		// 	case TOKEN_LE: 
-		// 	case TOKEN_GT: 
-		// 	case TOKEN_GE:
-		// 	case TOKEN_EQUAL:
-		// 		CG_OUTPUT("flds 4(%esp)\n");
-		// 		CG_OUTPUT("fcom\n");			
-		// 		break;
-		// }
-
-		
+		char fcom_lable_true[100], fcom_lable_false[100], fcom_lable_end[100]; 
+		CG_OUTPUT("flds (%esp)\n");	
+		CG_OUTPUT("flds 4(%esp)\n");
+		CG_OUTPUT("popl %eax\n");
+		CG_OUTPUT("popl %eax\n");
 		switch(pnode->attr.op){
 			case TOKEN_PLUS:
-				CG_OUTPUT("flds 4(%esp)\n");
-				CG_OUTPUT("flds (%esp)\n");		
-				CG_OUTPUT("popl %eax\n");
-				CG_OUTPUT("popl %eax\n");
 				CG_OUTPUT("faddp\n");
 				break;
-			case TOKEN_MINUS:				
-				CG_OUTPUT("flds (%esp)\n");	
-				CG_OUTPUT("flds 4(%esp)\n");
-				CG_OUTPUT("popl %eax\n");
-				CG_OUTPUT("popl %eax\n");
+			case TOKEN_MINUS:
 				CG_OUTPUT("fsubp\n");
 				break;
 			case TOKEN_MUL:
-				CG_OUTPUT("flds (%esp)\n");	
-				CG_OUTPUT("flds 4(%esp)\n");
-				CG_OUTPUT("popl %eax\n");
-				CG_OUTPUT("popl %eax\n");
 				CG_OUTPUT("fmulp\n");
 				break;
 			case TOKEN_DIV:
-				CG_OUTPUT("flds (%esp)\n");	
-				CG_OUTPUT("flds 4(%esp)\n");
-				CG_OUTPUT("popl %eax\n");
-				CG_OUTPUT("popl %eax\n");
 				CG_OUTPUT("fdivp\n");
 				break;
 			case TOKEN_LT:
 			case TOKEN_LE:
 			case TOKEN_GT:
 			case TOKEN_GE:
-			case TOKEN_EQUAL:
-				CG_OUTPUT("flds 4(%esp)\n");
-				CG_OUTPUT("flds (%esp)\n");		
-				CG_OUTPUT("popl %eax\n");
-				CG_OUTPUT("popl %eax\n");
-				CG_OUTPUT("fcom\n");
+			case TOKEN_EQUAL:	
+				CG_OUTPUT("fxch %st(1)\n");
+				CG_OUTPUT("fucomip %st(1),%st\n");
+				CG_OUTPUT("fstp %st(0)\n");
 				break;
 		}
-		
-		// CG_OUTPUT("popl %eax\n");
-		// CG_OUTPUT("popl %eax\n");
 		CG_OUTPUT("subl $4, %esp\n");
-		CG_OUTPUT("fstps (%esp)\n");
+		switch(pnode->attr.op){
+			case TOKEN_PLUS:
+			case TOKEN_MINUS:
+			case TOKEN_MUL:
+			case TOKEN_DIV:				
+				CG_OUTPUT("fstps (%esp)\n");			
+				break;
+			case TOKEN_LT:
+				strcpy(fcom_lable_false, GetLabel());
+				strcpy(fcom_lable_end, GetLabel());
+				if (pnode->attr.op == TOKEN_LT){
+					sprintf(tmp,"jnb %s\n", fcom_lable_false);
+					CG_OUTPUT(tmp);
+				}
+			case TOKEN_LE:
+				if (pnode->attr.op == TOKEN_LE){
+					sprintf(tmp,"jnbe %s\n", fcom_lable_false);
+					CG_OUTPUT(tmp);	
+				}
+			case TOKEN_GT:
+				if (pnode->attr.op == TOKEN_GT){
+					sprintf(tmp,"jna %s\n", fcom_lable_false);
+					CG_OUTPUT(tmp);
+				}
+			case TOKEN_GE:
+				if (pnode->attr.op == TOKEN_GE){
+					sprintf(tmp,"jnae %s\n", fcom_lable_false);
+					CG_OUTPUT(tmp);
+				}
+			case TOKEN_EQUAL:
+				if (pnode->attr.op == TOKEN_EQUAL){
+					sprintf(tmp,"jne %s\n", fcom_lable_false);
+					CG_OUTPUT(tmp);
+				}
+				// sprintf(tmp, "%s:\n", fcom_lable_true);
+				// CG_OUTPUT(tmp);
+				CG_OUTPUT("movl $1, (%esp)\n");
+				sprintf(tmp,"jmp %s\n", fcom_lable_end);
+				CG_OUTPUT(tmp);
+				sprintf(tmp, "%s:\n", fcom_lable_false);
+				CG_OUTPUT(tmp);
+				CG_OUTPUT("movl $0, (%esp)\n");
+				sprintf(tmp, "%s:\n", fcom_lable_end);
+				CG_OUTPUT(tmp);
+		}	
 		CG_OUTPUT("popl %eax\n");
+		// CG_OUTPUT("subl $4, %esp\n");
+		// CG_OUTPUT("fstps (%esp)\n");
+		// CG_OUTPUT("popl %eax\n");
 		
 	}
 }
