@@ -14,10 +14,10 @@ TreeNode* newNode(int kind){
         //t->kind.decl = kind&0xF;
 
         switch(t->nodekind){
-            case NODE_STATEMENT: t->kind.stmt = kind&0xF; break;
-            case NODE_EXPRESSION: t->kind.exp = kind&0xF; t->type = EXPTYPE_VOID; break;
-            case NODE_DECLARE: t->kind.decl = kind&0xF; break;
-            case NODE_TYPE: t->kind.type = kind&0xF; break;
+            case NODE_STATEMENT: t->kind = kind&0xF; break;
+            case NODE_EXPRESSION: t->kind = kind&0xF; t->type = EXPTYPE_VOID; break;
+            case NODE_DECLARE: t->kind = kind&0xF; break;
+            case NODE_TYPE: t->kind = kind&0xF; break;
             default: break;
         }
         t->lineno=lineno;
@@ -179,7 +179,7 @@ TreeNode * newOpExpNode(TreeNode * first, TreeNode * second, TokenType op){
           t->child[i]=NULL;
         t->sibling=NULL;
         t->nodekind=NODE_EXPRESSION;
-        t->kind.exp=EXP_OP&0xF;
+        t->kind=EXP_OP&0xF;
         t->attr.op=op;
         t->lineno=lineno;
         t->child[0]=first;
@@ -216,7 +216,7 @@ TreeNode * newFuncSysExpNode(TokenType op, TreeNode* args){
           t->child[i]=NULL;
         t->sibling=NULL;
         t->nodekind=NODE_EXPRESSION;
-        t->kind.exp=EXP_FUNC_SYS;
+        t->kind=EXP_FUNC_SYS;
         t->child[0]=args;
         t->attr.op=op;
         t->lineno=lineno;
@@ -266,7 +266,7 @@ void printTree(TreeNode * tree){
         printSpaces();
         switch(tree->nodekind){
             case(NODE_STATEMENT):
-                switch((NODE_STATEMENT<<4)+tree->kind.stmt){
+                switch((NODE_STATEMENT<<4)+tree->kind){
                     case STMT_LABEL:    fprintf(listing,"Stmt labelno%d\n",tree->attr.val);break;
                     case STMT_ASSIGN:   fprintf(listing,"Stmt Assign\n");break;
                     case STMT_GOTO:     fprintf(listing,"goto %d\n",tree->attr.val);break;
@@ -283,7 +283,7 @@ void printTree(TreeNode * tree){
             break;
         
             case(NODE_EXPRESSION):
-               switch((NODE_EXPRESSION<<4)+tree->kind.exp){
+               switch((NODE_EXPRESSION<<4)+tree->kind){
                     case EXP_OP:
                         fprintf(listing,"EXP op: "); printToken(tree->attr.op,"\0");break;
                     case EXP_CONST:
@@ -300,11 +300,11 @@ void printTree(TreeNode * tree){
                     case EXP_FUNC_SYS: fprintf(listing,"Sys func:");printToken(tree->attr.op,"\0");break;
                     default: fprintf(listing,"Unknown Expression type\n");
                 }
-                //printf("EXPRESSION:%0x",tree->kind.exp);
+                //printf("EXPRESSION:%0x",tree->kind);
             break;
         
             case(NODE_DECLARE):
-                switch((NODE_DECLARE<<4)+tree->kind.decl){
+                switch((NODE_DECLARE<<4)+tree->kind){
                     case DECL_ROUTINEHEAD: fprintf(listing,"Routine Head\n");break;
                     case DECL_PROCEDURE: fprintf(listing,"Declare Procedure\n");break;
                     case DECL_PROCEDUREHEAD: fprintf(listing,"Procedure Head %s\n",tree->attr.name);break;
@@ -316,11 +316,11 @@ void printTree(TreeNode * tree){
                     case DECL_VAR_PARA:fprintf(listing,"var parameter:\n");break;
                     case DECL_VAL_PARA:fprintf(listing,"val parameters:\n");break;
                 }
-                //printf("DECLARE:%0x",(NODE_DECLARE<<4)+tree->kind.decl);
+                //printf("DECLARE:%0x",(NODE_DECLARE<<4)+tree->kind);
             break;
             
             case(NODE_TYPE):
-                switch((NODE_TYPE<<4)+tree->kind.type){
+                switch((NODE_TYPE<<4)+tree->kind){
                     case TYPE_SIMPLE_SYS:
                         switch(tree->type){
                             case EXPTYPE_INT:fprintf(listing,"type integer\n");break;
@@ -336,7 +336,7 @@ void printTree(TreeNode * tree){
                     case TYPE_RECORD: fprintf(listing,"type record\n");break;
                     default: fprintf(listing,"Unknown type\n");break;
                 }
-                //printf("TYPE:%0x",(NODE_TYPE<<4)+tree->kind.type);
+                //printf("TYPE:%0x",(NODE_TYPE<<4)+tree->kind);
             break;
 
             default: fprintf(listing,"Unknown node kind\n"); break;

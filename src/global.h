@@ -139,12 +139,7 @@ typedef struct treeNode{
     struct treeNode * sibling;
     int nodekind;
     int lineno;
-    union{ 
-        int stmt;
-        int exp;
-        int decl;
-        int type;
-    }kind;
+    int kind;
     union{
         TokenType op;
         char * name;
