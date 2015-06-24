@@ -14,9 +14,22 @@ writeln(c);
 c:=a/b;
 writeln(c);
 if c<0.1 then
- writeln(1)
+ writeln(123)
 else
  writeln(0);
+
+if c<=1.0 then
+ writeln(321)
+else
+ writeln(111);
+
+if c=-0.666667 then 
+ writeln(666)
+else 
+begin
+ writeln(111);
+ writeln(999);
+end;
 
 i:=2;
 writeln(i);

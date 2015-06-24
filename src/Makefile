@@ -10,6 +10,7 @@ compiler: tiny.l tiny.y global.h scan.h parse.h CG.h analyze.h symtab.h util.c m
 test: compiler
 	./compiler test.pas	
 	gcc -o test.o out.s
+	objdump -D test.o > dumps
 	./test.o || /bin/true
 
 clean:
@@ -18,6 +19,7 @@ clean:
 	rm lex.yy.c
 	rm compiler
 	rm test.o
-	rm out.s
+	rm dumps
 	rm data_part.asm
 	rm code_part.asm
+	rm out.s
