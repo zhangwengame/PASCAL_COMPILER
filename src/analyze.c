@@ -9,7 +9,7 @@ void insertNode(TreeNode* t) {
 	if(t == NULL) 
 		return;
 	if(t->nodekind == NODE_DECLARE) {
-		switch(t->kind.decl) {
+		switch(t->kind+(NODE_DECLARE<<4)) {
 			case DECL_CONST:
 			{
 				while(t != NULL) {
@@ -25,101 +25,97 @@ void insertNode(TreeNode* t) {
 					TreeNode* pname = t->child[0];
 					TreeNode* ptype = t->child[1];
 					while(pname != NULL) {
-						switch(ptype->kind.type) {
-								case TYPE_SIMPLE_ID:
-								{
-									TypeList l = typeListLookup(ptype->attr.name);
-									switch(l->type) {
-										case EXPTYPE_ARRAY: 
-										{
-											offset -= l->size;
-											varListInsert(pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
-											break;
-										}
-										case EXPTYPE_RECORD:
-										{
-											offset -= l->size;
-											varListInsert(pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
-											break;
-										}
-										default:
-										{	
-											offset -= OFFSET_INC;	
-											varListInsert(pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
-											break;
-										}
+						switch(ptype->kind+(NODE_TYPE<<4)) {
+							case TYPE_SIMPLE_ID:
+							{
+								TypeList l = typeListLookup(ptype->attr.name);
+								switch(l->type) {
+									case EXPTYPE_ARRAY: 
+									{
+										offset -= l->size;
+										varListInsert(pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
+										break;
 									}
-									break;
-								}
-								case TYPE_SIMPLE_ENUM: 
-								{
-									EnumDef eptr = newEnumDef(ptype->attr.name);
-									EnumDef etmp = eptr;
-									while(ptype->sibling != NULL) {
-										ptype = ptype->sibling;
-										etmp = insertEnumDef(etmp, ptype->attr.name);
+									case EXPTYPE_RECORD:
+									{
+										offset -= l->size;
+										varListInsert(pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
+										break;
 									}
-
-									offset -= OFFSET_INC;	
-									varListInsert(pname->attr.name, EXPTYPE_SIMPLE_ENUM, False,  currentNestLevel, (void*)eptr, pname->lineno, 0, offset);
-
-									break;
-								}
-								case TYPE_SIMPLE_LIMIT: 
-								{
-									SubBoundDef sub =  newSubBoundDef(ptype->child[0]->type, &(ptype->child[0]->attr.val), &(ptype->child[1]->attr.val));
-									offset -= OFFSET_INC;
-									varListInsert(pname->attr.name, EXPTYPE_SIMPLE_LIMIT, False, currentNestLevel, (void*)sub, pname->lineno, 0, offset);
-									break;
-								}
-								case TYPE_SIMPLE_SYS: 
-								{
-									offset -= OFFSET_INC;
-									varListInsert(pname->attr.name, ptype->type, False,  currentNestLevel, NULL, pname->lineno, 0, offset);
-									break;
-								}
-								case TYPE_ARRAY: 
-								{
-									int arraySize = 0;
-									if(ptype->child[0]->type == EXPTYPE_SIMPLE_LIMIT) {
-										arraySize = ptype->child[0]->child[1]->attr.val - ptype->child[0]->child[0]->attr.val + 1; 
-										ArrayDef pAttr = newArrayDef(ptype->child[1]->type, ptype->child[0]->child[0]->type, &(ptype->child[0]->child[0]->attr.val), &(ptype->child[0]->child[1]->attr.val));
-										offset -= (OFFSET_INC * arraySize);
-										varListInsert(pname->attr.name, ptype->type, False, currentNestLevel, (void*)pAttr, pname->lineno, 0, offset);
-									}
-					    			break;
-								}
-								case TYPE_RECORD:
-								{
-									TreeNode* nameNode = ptype->child[0];
-									TreeNode* typeNode = ptype->child[1];
-
-									TypeList l = newTypeDef(nameNode->attr.name, typeNode->type, currentNestLevel, NULL, OFFSET_INC);
-									offset -= OFFSET_INC;
-									TypeList tmp = l;
-									while(nameNode->sibling != NULL) {
-										nameNode = nameNode->sibling;
-										tmp = insertTypeDef(tmp, nameNode->attr.name, typeNode->type, currentNestLevel, NULL, OFFSET_INC);
+									default:
+									{	
 										offset -= OFFSET_INC;	
+										varListInsert(pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
+										break;
 									}
-								
-									while(ptype->sibling != NULL) {
-										ptype = ptype->sibling;
-										nameNode = ptype->child[0];
-										typeNode = ptype->child[1];
-										while(nameNode != NULL) {
-											tmp = insertTypeDef(tmp, nameNode->attr.name, typeNode->type, currentNestLevel, NULL, OFFSET_INC);	
-											offset -= OFFSET_INC;
-											nameNode = nameNode->sibling;
-										}
-									}
-									RecordDef r = newAnonyRecord(l); 
-									varListInsert(pname->attr.name, EXPTYPE_RECORD, False, currentNestLevel, (void*)r, t->lineno, 0, offset);	
-
-									break;
 								}
-								default:
-									break;						
+								break;
+							}
+							case TYPE_SIMPLE_ENUM: 
+							{
+								EnumDef eptr = newEnumDef(ptype->attr.name);
+								EnumDef etmp = eptr;
+								while(ptype->sibling != NULL) {
+									ptype = ptype->sibling;
+									etmp = insertEnumDef(etmp, ptype->attr.name);
+								}
+								offset -= OFFSET_INC;	
+								varListInsert(pname->attr.name, EXPTYPE_SIMPLE_ENUM, False,  currentNestLevel, (void*)eptr, pname->lineno, 0, offset);
+								break;
+							}
+							case TYPE_SIMPLE_LIMIT: 
+							{
+								SubBoundDef sub =  newSubBoundDef(ptype->child[0]->type, &(ptype->child[0]->attr.val), &(ptype->child[1]->attr.val));
+								offset -= OFFSET_INC;
+								varListInsert(pname->attr.name, EXPTYPE_SIMPLE_LIMIT, False, currentNestLevel, (void*)sub, pname->lineno, 0, offset);
+								break;
+							}
+							case TYPE_SIMPLE_SYS: 
+							{
+								offset -= OFFSET_INC;
+								varListInsert(pname->attr.name, ptype->type, False,  currentNestLevel, NULL, pname->lineno, 0, offset);
+								break;
+							}
+							case TYPE_ARRAY: 
+							{
+								int arraySize = 0;
+								if(ptype->child[0]->type == EXPTYPE_SIMPLE_LIMIT) {
+									arraySize = ptype->child[0]->child[1]->attr.val - ptype->child[0]->child[0]->attr.val + 1; 
+									ArrayDef pAttr = newArrayDef(ptype->child[1]->type, ptype->child[0]->child[0]->type, &(ptype->child[0]->child[0]->attr.val), &(ptype->child[0]->child[1]->attr.val));
+									offset -= (OFFSET_INC * arraySize);
+									varListInsert(pname->attr.name, ptype->type, False, currentNestLevel, (void*)pAttr, pname->lineno, 0, offset);
+								}
+				    			break;
+							}
+							case TYPE_RECORD:
+							{
+								TreeNode* nameNode = ptype->child[0];
+								TreeNode* typeNode = ptype->child[1];
+								TypeList l = newTypeDef(nameNode->attr.name, typeNode->type, currentNestLevel, NULL, OFFSET_INC);
+								offset -= OFFSET_INC;
+								TypeList tmp = l;
+								while(nameNode->sibling != NULL) {
+									nameNode = nameNode->sibling;
+									tmp = insertTypeDef(tmp, nameNode->attr.name, typeNode->type, currentNestLevel, NULL, OFFSET_INC);
+									offset -= OFFSET_INC;	
+								}
+							
+								while(ptype->sibling != NULL) {
+									ptype = ptype->sibling;
+									nameNode = ptype->child[0];
+									typeNode = ptype->child[1];
+									while(nameNode != NULL) {
+										tmp = insertTypeDef(tmp, nameNode->attr.name, typeNode->type, currentNestLevel, NULL, OFFSET_INC);	
+										offset -= OFFSET_INC;
+										nameNode = nameNode->sibling;
+									}
+								}
+								RecordDef r = newAnonyRecord(l); 
+								varListInsert(pname->attr.name, EXPTYPE_RECORD, False, currentNestLevel, (void*)r, t->lineno, 0, offset);	
+								break;
+							}
+							default:
+								break;						
 						}
 						pname = pname->sibling;
 					}
@@ -130,7 +126,7 @@ void insertNode(TreeNode* t) {
 			case DECL_TYPE:
 			{
 				while(t) {
-					switch(t->child[1]->kind.type) {
+					switch(t->child[1]->kind+(NODE_TYPE<<4)) {
 						case TYPE_SIMPLE_ID: 
 						{
 							typeListAliaseInsert(t->child[0]->attr.name, t->child[1]->attr.name);	
@@ -238,6 +234,7 @@ void traverse(TreeNode* t) {
 int buildSymtab(TreeNode* syntaxTree) {
 	offset = -4;
 	traverse(syntaxTree);
+	printf("here %d \n",TraceAnalyze);
 	if(TraceAnalyze) {
 		fprintf(listing, "\nSymbol table:\n\n");
 		printSymTab(listing);

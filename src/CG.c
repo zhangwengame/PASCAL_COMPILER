@@ -716,7 +716,7 @@ void GStmtInput(TreeNode* pnode){
 
 
 void CGNodeExpression(TreeNode* pnode){
-	switch (pnode->kind.exp){
+	switch (pnode->kind+(NODE_EXPRESSION<<4)){
 				case EXP_ID:
 				//printf("EXP_ID\n");
 				//fflush(stdout);
@@ -746,7 +746,7 @@ void GenerateCode(TreeNode* pnode){
 		case NODE_STATEMENT:
 			//printf("NODE_STATEMENT\n");
 			//fflush(stdout);
-			switch (pnode->kind.stmt){
+			switch (pnode->kind+(NODE_STATEMENT<<4)){
 				case STMT_ASSIGN:
 					//printf("STMT_ASSIGN\n");
 					//fflush(stdout);
@@ -800,7 +800,7 @@ void GenerateCode(TreeNode* pnode){
 				CGNodeExpression(pnode);
 			break;
 		case NODE_DECLARE:
-			switch (pnode->kind.decl){
+			switch (pnode->kind+(NODE_DECLARE<<4)){
 				case DECL_ROUTINEHEAD:
 					//printf("DECL_ROUTINEHEAD\n");
 					//fflush(stdout);
