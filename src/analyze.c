@@ -14,7 +14,7 @@ void insertNode(TreeNode* t) {
 			{
 				while(t != NULL) {
 					offset -= OFFSET_INC;
-					varListInsert(t->attr.name, t->type, True, currentNestLevel, NULL, t->lineno, 0, offset);
+					varListInsert(t, t->attr.name, t->type, True, currentNestLevel, NULL, t->lineno, 0, offset);
 					t = t->sibling;
 				}	
 				break;
@@ -33,19 +33,19 @@ void insertNode(TreeNode* t) {
 									case EXPTYPE_ARRAY: 
 									{
 										offset -= l->size;
-										varListInsert(pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
+										varListInsert(pname, pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
 										break;
 									}
 									case EXPTYPE_RECORD:
 									{
 										offset -= l->size;
-										varListInsert(pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
+										varListInsert(pname, pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
 										break;
 									}
 									default:
 									{	
 										offset -= OFFSET_INC;	
-										varListInsert(pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
+										varListInsert(pname, pname->attr.name, l->type, False, currentNestLevel, l->pAttr, pname->lineno, 0, offset);
 										break;
 									}
 								}
@@ -60,20 +60,20 @@ void insertNode(TreeNode* t) {
 									etmp = insertEnumDef(etmp, ptype->attr.name);
 								}
 								offset -= OFFSET_INC;	
-								varListInsert(pname->attr.name, EXPTYPE_SIMPLE_ENUM, False,  currentNestLevel, (void*)eptr, pname->lineno, 0, offset);
+								varListInsert(pname, pname->attr.name, EXPTYPE_SIMPLE_ENUM, False,  currentNestLevel, (void*)eptr, pname->lineno, 0, offset);
 								break;
 							}
 							case TYPE_SIMPLE_LIMIT: 
 							{
 								SubBoundDef sub =  newSubBoundDef(ptype->child[0]->type, &(ptype->child[0]->attr.val), &(ptype->child[1]->attr.val));
 								offset -= OFFSET_INC;
-								varListInsert(pname->attr.name, EXPTYPE_SIMPLE_LIMIT, False, currentNestLevel, (void*)sub, pname->lineno, 0, offset);
+								varListInsert(pname, pname->attr.name, EXPTYPE_SIMPLE_LIMIT, False, currentNestLevel, (void*)sub, pname->lineno, 0, offset);
 								break;
 							}
 							case TYPE_SIMPLE_SYS: 
 							{
 								offset -= OFFSET_INC;
-								varListInsert(pname->attr.name, ptype->type, False,  currentNestLevel, NULL, pname->lineno, 0, offset);
+								varListInsert(pname, pname->attr.name, ptype->type, False,  currentNestLevel, NULL, pname->lineno, 0, offset);
 								break;
 							}
 							case TYPE_ARRAY: 
@@ -83,7 +83,7 @@ void insertNode(TreeNode* t) {
 									arraySize = ptype->child[0]->child[1]->attr.val - ptype->child[0]->child[0]->attr.val + 1; 
 									ArrayDef pAttr = newArrayDef(ptype->child[1]->type, ptype->child[0]->child[0]->type, &(ptype->child[0]->child[0]->attr.val), &(ptype->child[0]->child[1]->attr.val));
 									offset -= (OFFSET_INC * arraySize);
-									varListInsert(pname->attr.name, ptype->type, False, currentNestLevel, (void*)pAttr, pname->lineno, 0, offset);
+									varListInsert(pname, pname->attr.name, ptype->type, False, currentNestLevel, (void*)pAttr, pname->lineno, 0, offset);
 								}
 				    			break;
 							}
@@ -111,7 +111,7 @@ void insertNode(TreeNode* t) {
 									}
 								}
 								RecordDef r = newAnonyRecord(l); 
-								varListInsert(pname->attr.name, EXPTYPE_RECORD, False, currentNestLevel, (void*)r, t->lineno, 0, offset);	
+								varListInsert(pname, pname->attr.name, EXPTYPE_RECORD, False, currentNestLevel, (void*)r, t->lineno, 0, offset);	
 								break;
 							}
 							default:
