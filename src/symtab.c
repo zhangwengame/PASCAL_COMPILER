@@ -300,7 +300,6 @@ int funcListInsert(TreeNode* funcHead) {
 		tmp->next = (l == NULL)? NULL:l;
 		funcHashTable[h] = tmp;
 	}
-	//else ErrorHandler(ERROR_FUNC_REDEC, funcHead);
 
 	return offset;
 }
@@ -349,6 +348,10 @@ void varListInsert(TreeNode* t, char* name, ExpType type, int isConst, int nestL
 	VariableList tmp = l;
 	while((tmp != NULL) && (strcmp(name, tmp->name)))
 			tmp = tmp->next;
+	//printf("%s %d\n",name,tmp==NULL);
+	//if (tmp!=NULL)
+	//	printf("%s\n",tmp->name);
+	
 	if(tmp == NULL || (strcmp(name, tmp->name)==0 && nestLevel>tmp->nestLevel)) { /*process with same nestlevel not yet in the table, insert to the list head*/
 		tmp = (VariableList) malloc(sizeof(struct VariableListRec));
 		tmp->name = name;
@@ -363,14 +366,16 @@ void varListInsert(TreeNode* t, char* name, ExpType type, int isConst, int nestL
 		tmp->memloc.offset = offset;
 		tmp->next = (l == NULL)? NULL:l;
 		variableHashTable[h] = tmp;
+		//printf("%s no\n",name);
 	} else { /*find the exact variable*/
-		/*LineList t = tmp->lines;
+		LineList t = tmp->lines;
 		while(t->next != NULL)
 			t = t->next;
 		t->next = (LineList) malloc(sizeof(struct LineListRec));
 		t->next->lineno = lineno;
-		t->next->next = NULL;*/
+		t->next->next = NULL;
 		//ErrorHandler(ERROR_VAR_REDEC, t);
+
 	}
 }
 
@@ -547,7 +552,7 @@ int leaveScope() {
 /*print symbol table*/
 void printSymTab(FILE* listing) {
 	int i;
-	fprintf(listing, "Variable Name	| NestLevel | Line Number\n");
+	fprintf(listing, "Variable Name	| Level | Line Number\n");
 	fprintf(listing, ":\n");
 	for(i=0; i<SIZE; i++) {
 		if(variableHashTable[i] != NULL) {
@@ -567,7 +572,7 @@ void printSymTab(FILE* listing) {
 		}
 	}
 
-	fprintf(listing, "Function Name	| NestLevel | Return Type | Parameter\n");
+	fprintf(listing, "Function Name	| Level | Return Value Type | Parameter\n");
 	fprintf(listing, ": \n");
 	for(i=0; i<SIZE; i++) {
 		if(funcHashTable[i] != NULL) {
