@@ -7,3 +7,4 @@ dumps
 data_part.asm
 code_part.asm
 out.s
+*~
