@@ -14,15 +14,21 @@ char tmp[200];
 
 void CGExpOp(TreeNode* pnode){
 
+	
 	if (pnode->child[0]!=NULL && pnode->child[1]!=NULL){
 		GenerateCode(pnode->child[0]);
 		CG_OUTPUT("pushl %eax\n");
 	
 		GenerateCode(pnode->child[1]);
 		CG_OUTPUT("pushl %eax\n");
-
+		//printf("%d,%d\n",(pnode->child[0])->RuningType,(pnode->child[1])->RuningType);
 		if ((pnode->child[0])->RuningType != (pnode->child[1])->RuningType){
- 			ErrorHandler(ERROR_TYPE_MISMATCH, pnode);			
+			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
+ 				ErrorHandler(ERROR_TYPE_MISMATCH, pnode);
+ 			}
+ 			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
+ 			//printf("%d\n",pnode->child[0]->ERROR_STATE);
+ 			return;			
  		}
  		
 		if ((pnode->child[0])->RuningType==EXPTYPE_REAL && (pnode->child[1])->RuningType==EXPTYPE_REAL)
@@ -211,7 +217,11 @@ void CGExpId(TreeNode* pnode){
 
 	VariableList ssvar=varListLookup(pnode->attr.name);
  	if (ssvar==NULL){
- 		ErrorHandler(ERROR_VAR_MISS, pnode);
+ 		if (!pnode->ERROR_STATE){
+ 			ErrorHandler(ERROR_VAR_MISS, pnode);
+ 			pnode->ERROR_STATE=ERROR_VAR_MISS;
+ 		}
+ 		return;
  	}
 
  	cgtype=ssvar->type;
@@ -220,7 +230,11 @@ void CGExpId(TreeNode* pnode){
 
 		//st_var=arrayLookup(pnode->attr.name,(pnode->child[0])->attr.val);
 		if (ssvar->pAttr==NULL){
- 			ErrorHandler(ERROR_VAR_NOTARRAY, pnode);
+			if (!pnode->ERROR_STATE){
+ 				ErrorHandler(ERROR_VAR_NOTARRAY, pnode);
+ 				pnode->ERROR_STATE=ERROR_VAR_NOTARRAY;
+ 			}
+ 			return;
  		}
 
 		lower=(((ArrayDef)ssvar->pAttr)->subBound)->LowerBound.i;
@@ -390,19 +404,47 @@ void CGStmtProc(TreeNode* pnode){
 
 void CGStmtAssign(TreeNode* pnode){
 
-
-	//if  (pnode->attr.op==TOKEN_ID){   // x:=1;
+		/*VariableList r_ssvar=varListLookup((pnode->child[1])->attr.name);
+		if (r_ssvar==NULL){
+			ErrorHandler(ERROR_VAR_MISS, pnode);
+		}
+		else {*/
 		GenerateCode(pnode->child[1]);
 		CG_OUTPUT("pushl %eax\n");
-		VariableList ssvar=varListLookup((pnode->child[0])->attr.name);
-		if (ssvar->isConst){		
- 			ErrorHandler(ERROR_VAR_MODIFYCONST, pnode);
+		//}
+	//if  (pnode->attr.op==TOKEN_ID){   // x:=1;
+		//left_value should be fixed
+		VariableList l_ssvar=varListLookup((pnode->child[0])->attr.name);
+		if (l_ssvar==NULL){
+			if (!pnode->child[0]->ERROR_STATE){
+ 			ErrorHandler(ERROR_VAR_MISS, (pnode->child[0]));
+ 			pnode->child[0]->ERROR_STATE=ERROR_VAR_MISS;
+ 			}
+ 			return;
+			//printf("here1\n");
+			//printf("here2\n");
 		}
-		GenerateCode(pnode->child[0]);
-		CG_OUTPUT("popl %eax\n");
-		CG_OUTPUT("movl %eax, -0(%esi)\t# assign\n");
-	/*}
-	else if (pnode->attr.op==TOKEN_ARRAY){ //x[1]:=1
+		else if (l_ssvar->isConst){
+			if (!pnode->child[0]->ERROR_STATE){
+ 			ErrorHandler(ERROR_VAR_MODIFYCONST, (pnode->child[0]));
+ 			pnode->child[0]->ERROR_STATE=ERROR_VAR_MODIFYCONST;
+ 			}		
+ 			return;
+		}
+		else if (l_ssvar->type!=pnode->child[1]->RuningType){
+			//printf("%d,%d,%d\n",l_ssvar->type,(pnode->child[1])->RuningType,EXPTYPE_VOID);
+			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
+			ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
+			return;
+		}
+		else{
+			GenerateCode(pnode->child[0]);
+			CG_OUTPUT("popl %eax\n");
+			CG_OUTPUT("movl %eax, -0(%esi)\t# assign\n");
+		}
+		
+	
+	/*else if (pnode->attr.op==TOKEN_ARRAY){ //x[1]:=1
 		GenerateCode(pnode->child[2]);
 		CG_OUTPUT("pushl %eax\n");
 

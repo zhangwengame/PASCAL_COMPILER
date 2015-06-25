@@ -21,6 +21,7 @@ TreeNode* newNode(int kind){
             default: break;
         }
         t->lineno=lineno;
+        t->ERROR_STATE=0;
     }
     return t;
 }

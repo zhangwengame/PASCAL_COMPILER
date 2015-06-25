@@ -84,12 +84,12 @@ typedef enum{
 #define TYPE_RECORD 0x46
 
 // Defination of error type
-#define ERROR_TYPE_MISMATCH 0
-#define ERROR_VAR_MISS 1
-#define ERROR_VAR_NOTARRAY 2
-#define ERROR_VAR_MODIFYCONST 3
-#define ERROR_VAR_REDEC 4
-#define ERROR_FUNC_REDEC 5
+#define ERROR_TYPE_MISMATCH 1
+#define ERROR_VAR_MISS 2
+#define ERROR_VAR_NOTARRAY 3
+#define ERROR_VAR_MODIFYCONST 4
+#define ERROR_VAR_REDEC 5
+#define ERROR_FUNC_REDEC 6
 /*
 #define EXPTYPE_VOID 0x51
 #define EXPTYPE_INT 0x52
@@ -158,6 +158,7 @@ typedef struct treeNode{
     }attr;
     ExpType type;
     ExpType RuningType;
+    int ERROR_STATE;
 }TreeNode;
 
 extern int TraceScan;
