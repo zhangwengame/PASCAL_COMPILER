@@ -26,7 +26,7 @@ TreeNode* newNode(int kind){
 }
 
 void printToken(TokenType token, const char * tokenString){
-    /*switch(token){
+    switch(token){
         case ENDFILE:
             fprintf(listing,"EOF\n");break;
         case ERROR:
@@ -112,7 +112,7 @@ void printToken(TokenType token, const char * tokenString){
         
         default:
             fprintf(listing,"Ttoken:%s\n",tokenString);
-    }*/
+    }
 }
 
 TreeNode * newOpExpNode(TreeNode * first, TreeNode * second, TokenType op){

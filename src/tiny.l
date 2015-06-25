@@ -105,8 +105,8 @@ TokenType getToken(){
     strncpy(previoustokenString,tokenString,MAXTOKENLEN);
     strncpy(tokenString,yytext,MAXTOKENLEN);
     if(TraceScan){
-        fprintf(listing,"\t%d: ",lineno);;
-        printToken(currentToken,tokenString);
+     //   fprintf(listing,"\t%d: ",lineno);;
+     //   printToken(currentToken,tokenString);
     }
     return currentToken;
 }
