@@ -1,0 +1,10 @@
+y.tab.c
+y.tab.h
+lex.yy.c
+complier
+test.o
+dumps
+data_part.asm
+code_part.asm
+out.s
+*~

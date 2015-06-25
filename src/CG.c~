@@ -374,7 +374,7 @@ void HandleFuncExc(TreeNode* pnode){
 }
 
 
-void HandleProcExc(TreeNode* pnode){
+void CGStmtProc(TreeNode* pnode){
 
 	ProcList judge_var=procListLookup(pnode->attr.name);
 
@@ -795,7 +795,7 @@ void GenCode(TreeNode* pnode){
 					HandleLabelStmt(pnode);
 					break;	
 				case STMT_PROC_ID:
-					HandleProcExc(pnode);
+					CGStmtProc(pnode);
 					break;
 				case STMT_PROC_SYS:
 					switch(pnode->attr.op)

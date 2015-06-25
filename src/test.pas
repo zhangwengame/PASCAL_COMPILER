@@ -1,46 +1,21 @@
 program a; 
 var
-i,j,z:integer;
-a,b,c:real;
+i,j:integer;
+procedure swap(var a:integer;var b:integer);
+var t:integer;
 begin
-a:=0.2;
-writeln(a);
-b:=-0.3;
-writeln(b);
-c:=a+b-0.001;
-writeln(c);
-c:=a*b;
-writeln(c);
-c:=a/b;
-writeln(c);
-if c<0 then
- writeln(123)
-else
- writeln(0);
-
-if c<=1.0 then
- writeln(321)
-else
- writeln(111);
-
-if c=-0.666667 then 
- writeln(666)
-else 
-begin
- writeln(999);
+	if a>b then
+	 begin
+		t:=a;
+		a:=b;
+		b:=t;
+	end;
 end;
 
-i:=2;
-writeln(i);
-j:=-3;
-writeln(j);
-z:=i*j;
-writeln(z);	
-z:=i mod j;
-writeln(z);
-
-if i < j then
- writeln(123456)
-else
- writeln(654321);
+begin
+i:=10;
+j:=5;
+swap(i,j);
+write(i);
+write(j);
 end.
