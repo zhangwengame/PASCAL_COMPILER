@@ -21,10 +21,8 @@ void CGExpOp(TreeNode* pnode){
 		GenerateCode(pnode->child[1]);
 		CG_OUTPUT("pushl %eax\n");
 
-
 		if ((pnode->child[0])->RuningType != (pnode->child[1])->RuningType){
- 			printf("Line %d, Error: Different data type can not be calculated.\n",pnode->lineno);
- 			fflush(stdout);				
+ 			ErrorHandler(ERROR_TYPE_MISMATCH, pnode);			
  		}
  		
 		if ((pnode->child[0])->RuningType==EXPTYPE_REAL && (pnode->child[1])->RuningType==EXPTYPE_REAL)
@@ -201,8 +199,7 @@ void CGExpId(TreeNode* pnode){
 
 	VariableList ssvar=varListLookup(pnode->attr.name);
  	if (ssvar==NULL){
- 		printf("Line %d, Error: The variable %s is not existed.\n",pnode->lineno,pnode->attr.name);
- 		fflush(stdout);
+ 		ErrorHandler(ERROR_VAR_MISS, pnode);
  	}
 
  	cgtype=ssvar->type;
@@ -211,8 +208,7 @@ void CGExpId(TreeNode* pnode){
 
 		//st_var=arrayLookup(pnode->attr.name,(pnode->child[0])->attr.val);
 		if (ssvar->pAttr==NULL){
- 			printf("Line %d, Error: The variable %s is not an array.\n",pnode->lineno,pnode->attr.name);
- 			fflush(stdout);
+ 			ErrorHandler(ERROR_VAR_NOTARRAY, pnode);
  		}
 
 		lower=(((ArrayDef)ssvar->pAttr)->subBound)->LowerBound.i;
@@ -388,8 +384,7 @@ void CGStmtAssign(TreeNode* pnode){
 		CG_OUTPUT("pushl %eax\n");
 		VariableList ssvar=varListLookup((pnode->child[0])->attr.name);
 		if (ssvar->isConst){		
- 			printf("Line %d, Error: The const variable %s can not be assigned.\n",pnode->lineno,(pnode->child[0])->attr.name);
- 			fflush(stdout);	
+ 			ErrorHandler(ERROR_VAR_MODIFYCONST, pnode);
 		}
 		GenerateCode(pnode->child[0]);
 		CG_OUTPUT("popl %eax\n");
