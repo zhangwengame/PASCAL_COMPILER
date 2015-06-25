@@ -146,7 +146,7 @@ TreeNode * newFuncSysExpNode(TokenType op, TreeNode* args){
           t->child[i]=NULL;
         t->sibling=NULL;
         t->nodekind=NODE_EXPRESSION;
-        t->kind=EXP_FUNC_SYS;
+        t->kind=EXP_FUNC_SYS&0xF;
         t->child[0]=args;
         t->attr.op=op;
         t->lineno=lineno;

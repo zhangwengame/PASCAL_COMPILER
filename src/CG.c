@@ -415,6 +415,8 @@ void HandleAssignStmt(TreeNode* pnode){
 		GenCode(pnode->child[1]);
 		EMITCODE("pushl %eax\n");
 		VariableList l_ssvar=varListLookup((pnode->child[0])->attr.name);
+		FuncList r_ssfuc=funcListLookup((pnode->child[1])->attr.name);
+		//VariableList r_ssvar=funcListLookup((pnode->child[1])->attr.name);
 		if (l_ssvar==NULL){
 			if (!pnode->child[0]->ERROR_STATE){
  			ErrorHandler(ERROR_VAR_MISS, (pnode->child[0]));
@@ -431,7 +433,12 @@ void HandleAssignStmt(TreeNode* pnode){
  			}		
  			return;
 		}
-		else if (l_ssvar->type!=pnode->child[1]->RuningType){
+		if (r_ssfuc&&l_ssvar->type!=r_ssfuc->retType){
+			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
+			ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
+			return;
+		}
+		else if (!r_ssfuc&&l_ssvar->type!=pnode->child[1]->RuningType){
 			//printf("%d,%d,%d\n",l_ssvar->type,(pnode->child[1])->RuningType,EXPTYPE_VOID);
 			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
 			ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
