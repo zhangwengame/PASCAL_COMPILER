@@ -1,22 +1,17 @@
 program a; 
 var
-<<<<<<< HEAD
 i,j:integer;
-procedure swap(var a:integer;var b:integer);
-var t:integer;
+function gcd(a:integer;b:integer):integer;
 begin
-	if a>b then
-	 begin
-		t:=a;
-		a:=b;
-		b:=t;
-	end;
+	if b=0 then
+		gcd:=a
+	else 
+		gcd:=gcd(b,a mod b);
 end;
 
 begin
-i:=10;
-j:=5;
-swap(i,j);
-write(i);
+j:=gcd(36,24);
 write(j);
 end.
+
+
