@@ -97,11 +97,11 @@ void CGExpOp(TreeNode* pnode){
 		// EMITCODE("flds (%esp)\n");		
 		// to be decided
 		char fcom_lable_false[100], fcom_lable_end[100]; 
-		if (pnode->child[1])->RuningType == EXPTYPE_INT){
+		if (pnode->child[1]!=NULL&&((pnode->child[1])->RuningType == EXPTYPE_INT)){
 			EMITCODE("filds (%esp)\n");	
 		}
 		else EMITCODE("flds (%esp)\n");			
-		if (pnode->child[0])->RuningType == EXPTYPE_INT){
+		if ((pnode->child[0])->RuningType == EXPTYPE_INT){
 			EMITCODE("filds 4(%esp)\n");	
 		}
 		else EMITCODE("flds 4(%esp)\n");	
