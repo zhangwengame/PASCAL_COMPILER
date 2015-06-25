@@ -24,10 +24,12 @@ typedef int TokenType;
 extern FILE* source;
 extern FILE* listing;
 //extern FILE* code;
-
-extern int lineno;
 extern int TraceAnalyze;
-
+extern TraceScan;
+extern int lineno;
+extern int DEBUG_MODE;
+extern int COMPILE_ERROR;
+extern int ERROR_COUNT;
 /*
 typedef enum{
     // book-keeping
@@ -161,11 +163,5 @@ typedef struct treeNode{
     ExpType RuningType;
     int ERROR_STATE;
 }TreeNode;
-
-extern int TraceScan;
-
-
-
-
 
 #endif

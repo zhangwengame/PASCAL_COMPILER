@@ -12,6 +12,8 @@ int TraceAnalyze = False;
 int TraceScan= False;
 int lineno=0;
 int DEBUG_MODE=0;
+int COMPILE_ERROR=0;
+int ERROR_COUNT=0;
 
 int main(int argc, char const *argv[]){
 // ningning
@@ -37,6 +39,10 @@ int main(int argc, char const *argv[]){
 		printTree(syntaxTree); 
 	}
 	CG_main(syntaxTree, "out.s");
+	if (COMPILE_ERROR){
+		fprintf(listing, "%d errors generated.\n",ERROR_COUNT);
+		return -1;
+	}
  //   while(getToken()!=ENDFILE);
 // caihua
     return 0;

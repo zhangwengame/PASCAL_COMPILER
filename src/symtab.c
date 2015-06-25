@@ -78,6 +78,8 @@ void ErrorHandler(int errortype, TreeNode * pnode){
  			fflush(stdout);	
 			break;
 	}
+	COMPILE_ERROR=1;
+	++ERROR_COUNT;
 }
 
 /*=========================定义对符号表的插入操作=================================*/

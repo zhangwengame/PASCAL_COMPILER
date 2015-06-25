@@ -992,17 +992,18 @@ EMITCODE("main:\n");
 	fclose(codename);
 	fclose(dataname);
 	
-
-	ff = fopen(ffname, "w");
-	codename = fopen("code_part.asm", "r");
-	dataname = fopen("data_part.asm", "r");	
-	while(fgets(buf,BUFSIZ,dataname)!=NULL){
-		fputs(buf,ff);
+	if (!COMPILE_ERROR){
+		ff = fopen(ffname, "w");
+		codename = fopen("code_part.asm", "r");
+		dataname = fopen("data_part.asm", "r");	
+		while(fgets(buf,BUFSIZ,dataname)!=NULL){
+			fputs(buf,ff);
+		}
+		while(fgets(buf,BUFSIZ,codename)!=NULL){
+			fputs(buf,ff);
+		}	
+		fclose(codename);
+		fclose(dataname);
+		fclose(ff);
 	}
-	while(fgets(buf,BUFSIZ,codename)!=NULL){
-		fputs(buf,ff);
-	}	
-	fclose(codename);
-	fclose(dataname);
-	fclose(ff);	
 }
