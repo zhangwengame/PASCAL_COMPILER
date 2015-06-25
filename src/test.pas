@@ -1,5 +1,6 @@
 program a; 
 var
+<<<<<<< HEAD
 i,j:integer;
 procedure swap(var a:integer;var b:integer);
 var t:integer;
