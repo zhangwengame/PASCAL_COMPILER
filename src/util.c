@@ -11,7 +11,6 @@ TreeNode* newNode(int kind){
           t->child[i]=NULL;
         t->sibling=NULL;
         t->nodekind=kind>>4;
-        //t->kind.decl = kind&0xF;
 
         switch(t->nodekind){
             case NODE_STATEMENT: t->kind = kind&0xF; break;

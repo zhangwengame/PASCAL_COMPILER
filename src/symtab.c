@@ -199,7 +199,7 @@ int procListInsert(TreeNode* procHead) {
 	if(procHead->child[0] == NULL)
 		paraList = NULL;
 	else {
-	   	if(procHead->child[0]->kind == DECL_VAR_PARA&0xF) {
+	   	if(procHead->child[0]->kind == (DECL_VAR_PARA&0xF)) {
 			paraList = newSimpleTypeList(procHead->child[0]->child[0]->attr.name, procHead->child[0]->child[1]->type, True);
 		} else {
 			paraList = newSimpleTypeList(procHead->child[0]->child[0]->attr.name, procHead->child[0]->child[1]->type, False);
@@ -211,7 +211,7 @@ int procListInsert(TreeNode* procHead) {
 		tmpNode = procHead->child[0]->sibling;
 		tmpList = paraList;
 		while(tmpNode != NULL) {
-			if(tmpNode->kind == DECL_VAR_PARA&0xF)
+			if(tmpNode->kind == (DECL_VAR_PARA&0xF))
 				tmpList = insertSimpleTypeList(tmpList, tmpNode->child[0]->attr.name, tmpNode->child[1]->type, True);
 			else
 				tmpList = insertSimpleTypeList(tmpList, tmpNode->child[0]->attr.name, tmpNode->child[1]->type, False);
@@ -257,7 +257,7 @@ int funcListInsert(TreeNode* funcHead) {
 	if(funcHead->child[0] == NULL)
 		paraList = NULL;
 	else {
-	   	if(funcHead->child[0]->kind == DECL_VAR_PARA&0xF) {
+	   	if(funcHead->child[0]->kind == (DECL_VAR_PARA&0xF)) {
 			paraList = newSimpleTypeList(funcHead->child[0]->child[0]->attr.name, funcHead->child[0]->child[1]->type, True);
 		} else {
 			paraList = newSimpleTypeList(funcHead->child[0]->child[0]->attr.name, funcHead->child[0]->child[1]->type, False);
@@ -268,7 +268,7 @@ int funcListInsert(TreeNode* funcHead) {
 		tmpNode = funcHead->child[0]->sibling;
 		tmpList = paraList;
 		while(tmpNode != NULL) {
-			if(tmpNode->kind == DECL_VAR_PARA&0xF)
+			if(tmpNode->kind == (DECL_VAR_PARA&0xF))
 				tmpList = insertSimpleTypeList(tmpList, tmpNode->child[0]->attr.name, tmpNode->child[1]->type, True);
 			else
 				tmpList = insertSimpleTypeList(tmpList, tmpNode->child[0]->attr.name, tmpNode->child[1]->type, False);
