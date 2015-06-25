@@ -19,7 +19,9 @@ char* GetDataLabel();
 void PopParam(TreeNode* pnode,SimpleTypeList judge_var);
 void PushParam(TreeNode* pnode);
 void HandleFuncExc(TreeNode* pnode);
-void HandleProcExc(TreeNode* pnode);
+void CGStmtProc(TreeNode* pnode);
+void CGDeclFunction(TreeNode* pnode);
+void CGDeclProcedure(TreeNode* pnode);
 
 void HandleAssignStmt(TreeNode* pnode);
 void HandleForStmt(TreeNode* pnode);
