@@ -300,7 +300,7 @@ int funcListInsert(TreeNode* funcHead) {
 		tmp->next = (l == NULL)? NULL:l;
 		funcHashTable[h] = tmp;
 	}
-	else ErrorHandler(ERROR_FUNC_REDEC, funcHead);
+	//else ErrorHandler(ERROR_FUNC_REDEC, funcHead);
 
 	return offset;
 }
@@ -370,7 +370,7 @@ void varListInsert(TreeNode* t, char* name, ExpType type, int isConst, int nestL
 		t->next = (LineList) malloc(sizeof(struct LineListRec));
 		t->next->lineno = lineno;
 		t->next->next = NULL;*/
-		ErrorHandler(ERROR_VAR_REDEC, t);
+		//ErrorHandler(ERROR_VAR_REDEC, t);
 	}
 }
 
@@ -394,6 +394,7 @@ VariableList varListLookup(char* name) {
 
 /*funcListLookup returns the FuncList of that name or null if not found*/
 FuncList funcListLookup(char* name) {
+	printf("here1\n");
 	int h = hash(name);
 	FuncList l = funcHashTable[h];
 	while((l != NULL) && (strcmp(name, l->name)))

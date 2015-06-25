@@ -29,8 +29,11 @@ void HandleExpOp(TreeNode* pnode){
  				ErrorHandler(ERROR_TYPE_MISMATCH, pnode);
  			}
  			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
- 			//printf("%d\n",pnode->child[0]->ERROR_STATE);
  			return;			
+ 		}
+ 		else if (pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE){
+ 			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
+ 			return;
  		}
  		
 		if ((pnode->child[0])->RuningType==EXPTYPE_REAL && (pnode->child[1])->RuningType==EXPTYPE_REAL)
@@ -412,36 +415,47 @@ void HandleProcExc(TreeNode* pnode){
 
 void HandleAssignStmt(TreeNode* pnode){
 	//if  (pnode->attr.op==TOKEN_ID){   // x:=1;
+		FuncList r_ssfuc=NULL;
+		VariableList l_ssvar=varListLookup((pnode->child[0])->attr.name);
+		//printf("%d,%d\n",(pnode->child[1])->nodekind,(pnode->child[1])->kind);
+		if ((pnode->child[1])->nodekind==2&&(pnode->child[1])->kind>4)
+			r_ssfuc=funcListLookup((pnode->child[1])->attr.name);
 		GenCode(pnode->child[1]);
 		EMITCODE("pushl %eax\n");
-		VariableList l_ssvar=varListLookup((pnode->child[0])->attr.name);
-		FuncList r_ssfuc=funcListLookup((pnode->child[1])->attr.name);
 		//VariableList r_ssvar=funcListLookup((pnode->child[1])->attr.name);
 		if (l_ssvar==NULL){
-			if (!pnode->child[0]->ERROR_STATE){
+			if (!pnode->child[1]->ERROR_STATE){
  			ErrorHandler(ERROR_VAR_MISS, (pnode->child[0]));
  			pnode->child[0]->ERROR_STATE=ERROR_VAR_MISS;
+ 			pnode->ERROR_STATE=ERROR_VAR_MISS;
  			}
  			return;
-			//printf("here1\n");
 			//printf("here2\n");
 		}
 		else if (l_ssvar->isConst){
-			if (!pnode->child[0]->ERROR_STATE){
+			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
  			ErrorHandler(ERROR_VAR_MODIFYCONST, (pnode->child[0]));
- 			pnode->child[0]->ERROR_STATE=ERROR_VAR_MODIFYCONST;
+ 			//pnode->child[0]->ERROR_STATE=ERROR_VAR_MODIFYCONST;
+ 			pnode->ERROR_STATE=ERROR_VAR_MODIFYCONST;
  			}		
  			return;
 		}
 		if (r_ssfuc&&l_ssvar->type!=r_ssfuc->retType){
-			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
-			ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
+			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
+				ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
+				//pnode->child[0]->ERROR_STATE=ERROR_TYPE_MISMATCH;
+ 				pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
+			}
 			return;
 		}
-		else if (!r_ssfuc&&l_ssvar->type!=pnode->child[1]->RuningType){
-			//printf("%d,%d,%d\n",l_ssvar->type,(pnode->child[1])->RuningType,EXPTYPE_VOID);
-			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
-			ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
+		else if (!r_ssfuc&&(l_ssvar->type<5)&&l_ssvar->type!=pnode->child[1]->RuningType){
+			printf("%d,%d\n",l_ssvar->type,pnode->child[1]->RuningType);
+			//printf("%d,%d\n",pnode->child[0]->ERROR_STATE,pnode->child[1]->ERROR_STATE);
+			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
+				ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
+				//pnode->child[0]->ERROR_STATE=ERROR_TYPE_MISMATCH;
+ 				pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
+			}
 			return;
 		}
 		else{

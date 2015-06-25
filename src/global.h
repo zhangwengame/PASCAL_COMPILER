@@ -25,7 +25,7 @@ extern FILE* source;
 extern FILE* listing;
 //extern FILE* code;
 extern int TraceAnalyze;
-extern TraceScan;
+extern int TraceScan;
 extern int lineno;
 extern int DEBUG_MODE;
 extern int COMPILE_ERROR;
