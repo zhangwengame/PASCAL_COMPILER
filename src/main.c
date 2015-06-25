@@ -8,8 +8,10 @@
 char filename[30] = "test.pas";
 FILE * source ;
 FILE * listing ;
-int TraceScan = True; 
+int TraceAnalyze = False; 
+int TraceScan= False;
 int lineno=0;
+int DEBUG_MODE=0;
 
 int main(int argc, char const *argv[]){
 // ningning
@@ -20,16 +22,22 @@ int main(int argc, char const *argv[]){
 		// filename = argv[0];
 		strcpy(filename, argv[1]);
 	}	
+	else if (argc==3){
+		if (!strcmp("-d",argv[2])){
+			DEBUG_MODE=1;
+			TraceAnalyze=True;
+			TraceScan=True;
+		}
+	}
     source = fopen(filename,"r");
-    listing = stdout;
     TreeNode * syntaxTree;
- //   while(getToken()!=ENDFILE);
+    listing = stdout;
     syntaxTree = parse();
-    printTree(syntaxTree);  
-
-// caihua
+	if (DEBUG_MODE){
+		printTree(syntaxTree); 
+	}
 	CG_main(syntaxTree, "out.s");
-
+ //   while(getToken()!=ENDFILE);
+// caihua
     return 0;
-
 }

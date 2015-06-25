@@ -26,6 +26,7 @@ extern FILE* listing;
 //extern FILE* code;
 
 extern int lineno;
+extern int TraceAnalyze;
 
 /*
 typedef enum{
