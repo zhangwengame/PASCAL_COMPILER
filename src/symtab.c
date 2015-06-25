@@ -544,7 +544,7 @@ int leaveScope() {
 /*print symbol table*/
 void printSymTab(FILE* listing) {
 	int i;
-	fprintf(listing, "Variable Name	| NestLevel | Line Number\n");
+	fprintf(listing, "Variable Name	| Level | Line Number\n");
 	fprintf(listing, ":\n");
 	for(i=0; i<SIZE; i++) {
 		if(variableHashTable[i] != NULL) {
@@ -564,7 +564,7 @@ void printSymTab(FILE* listing) {
 		}
 	}
 
-	fprintf(listing, "Function Name	| NestLevel | Return Type | Parameter\n");
+	fprintf(listing, "Function Name	| Level | Return Value Type | Parameter\n");
 	fprintf(listing, ": \n");
 	for(i=0; i<SIZE; i++) {
 		if(funcHashTable[i] != NULL) {

@@ -25,7 +25,7 @@ TreeNode* newNode(int kind){
 }
 
 void printToken(TokenType token, const char * tokenString){
-    switch(token){
+    /*switch(token){
         case ENDFILE:
             fprintf(listing,"EOF\n");break;
         case ERROR:
@@ -110,8 +110,8 @@ void printToken(TokenType token, const char * tokenString){
         case TOKEN_SUCC:fprintf(listing,"succ\n");break;
         
         default:
-            fprintf(listing,"Unknown token:%s\n",tokenString);
-    }
+            fprintf(listing,"Ttoken:%s\n",tokenString);
+    }*/
 }
 
 TreeNode * newOpExpNode(TreeNode * first, TreeNode * second, TokenType op){
@@ -196,8 +196,8 @@ void printTree(TreeNode * tree){
         switch(tree->nodekind){
             case(NODE_STATEMENT):
                 switch((NODE_STATEMENT<<4)+tree->kind){
-                    case STMT_LABEL:    fprintf(listing,"Stmt labelno%d\n",tree->attr.val);break;
-                    case STMT_ASSIGN:   fprintf(listing,"Stmt Assign\n");break;
+                    case STMT_LABEL:    fprintf(listing,"Statement label%d\n",tree->attr.val);break;
+                    case STMT_ASSIGN:   fprintf(listing,"Statement assign\n");break;
                     case STMT_GOTO:     fprintf(listing,"goto %d\n",tree->attr.val);break;
                     case STMT_IF:       fprintf(listing,"if\n");break;
                     case STMT_REPEAT:   fprintf(listing,"repeat\n");break;
@@ -206,7 +206,7 @@ void printTree(TreeNode * tree){
                     case STMT_FOR:      fprintf(listing,"for direction:");printToken(tree->attr.op,"\0");break;
                     case STMT_PROC_SYS:  fprintf(listing,"system procedure:");printToken(tree->attr.op,"\0");break;
                     case STMT_PROC_ID:   fprintf(listing,"procedure:");break;
-                    default: fprintf(listing,"Unknown Statement type\n");break;
+                    default: fprintf(listing,"Other Statement type\n");break;
                 }
                 //printf("STATEMENT:%0x",(NODE_STATEMENT<<4)+tree->kind.stmt);
             break;
@@ -217,30 +217,30 @@ void printTree(TreeNode * tree){
                         fprintf(listing,"EXP op: "); printToken(tree->attr.op,"\0");break;
                     case EXP_CONST:
                         switch(tree->type){
-                            case EXPTYPE_INT: fprintf(listing,"const int:%d\n",tree->attr.val); break;
-                            case EXPTYPE_REAL: fprintf(listing,"const real:%lf\n",tree->attr.real_val); break;
-                            case EXPTYPE_CHAR: fprintf(listing,"const char:%c\n",tree->attr.char_val); break;
-                            case EXPTYPE_STRING: fprintf(listing,"const string:%s\n",tree->attr.string_val); break;
+                            case EXPTYPE_INT: fprintf(listing,"const int, val=%d\n",tree->attr.val); break;
+                            case EXPTYPE_REAL: fprintf(listing,"const real, val%lf\n",tree->attr.real_val); break;
+                            case EXPTYPE_CHAR: fprintf(listing,"const char, val%c\n",tree->attr.char_val); break;
+                            case EXPTYPE_STRING: fprintf(listing,"const string, val%s\n",tree->attr.string_val); break;
                         }
                         break;
-                    case EXP_ID: fprintf(listing,"Exp ID: %s\n",tree->attr.name); break;
+                    case EXP_ID: fprintf(listing,"Exp: %s\n",tree->attr.name); break;
                     case EXP_CASE: fprintf(listing,"Exp case:");break;
                     case EXP_FUNC_ID: fprintf(listing,"Func:");break;
                     case EXP_FUNC_SYS: fprintf(listing,"Sys func:");printToken(tree->attr.op,"\0");break;
-                    default: fprintf(listing,"Unknown Expression type\n");
+                    default: fprintf(listing,"Other Expression type\n");
                 }
                 //printf("EXPRESSION:%0x",tree->kind);
             break;
         
             case(NODE_DECLARE):
                 switch((NODE_DECLARE<<4)+tree->kind){
-                    case DECL_ROUTINEHEAD: fprintf(listing,"Routine Head\n");break;
-                    case DECL_PROCEDURE: fprintf(listing,"Declare Procedure\n");break;
-                    case DECL_PROCEDUREHEAD: fprintf(listing,"Procedure Head %s\n",tree->attr.name);break;
-                    case DECL_CONST: fprintf(listing,"Const Declare:\n");break;
-                    case DECL_TYPE: fprintf(listing,"Type Declare:\n");break;
-                    case DECL_VAR: fprintf(listing,"Var Declare:\n");break;
-                    case DECL_FUNCTION: fprintf(listing,"Declare Function \n");break;
+                    case DECL_ROUTINEHEAD: fprintf(listing,"Routine head\n");break;
+                    case DECL_PROCEDURE: fprintf(listing,"Declare procedure\n");break;
+                    case DECL_PROCEDUREHEAD: fprintf(listing,"Procedure head %s\n",tree->attr.name);break;
+                    case DECL_CONST: fprintf(listing,"Const:\n");break;
+                    case DECL_TYPE: fprintf(listing,"Type:\n");break;
+                    case DECL_VAR: fprintf(listing,"Var:\n");break;
+                    case DECL_FUNCTION: fprintf(listing,"Function \n");break;
                     case DECL_FUNCTIONHEAD:fprintf(listing,"Function Head:%s\n",tree->attr.name);break;
                     case DECL_VAR_PARA:fprintf(listing,"var parameter:\n");break;
                     case DECL_VAL_PARA:fprintf(listing,"val parameters:\n");break;
@@ -263,12 +263,12 @@ void printTree(TreeNode * tree){
                     case TYPE_SIMPLE_LIMIT: fprintf(listing,"type limit\n"); break;
                     case TYPE_ARRAY: fprintf(listing,"type array\n");break;
                     case TYPE_RECORD: fprintf(listing,"type record\n");break;
-                    default: fprintf(listing,"Unknown type\n");break;
+                    default: fprintf(listing,"Other type\n");break;
                 }
                 //printf("TYPE:%0x",(NODE_TYPE<<4)+tree->kind);
             break;
 
-            default: fprintf(listing,"Unknown node kind\n"); break;
+            default: fprintf(listing,"Other nodes\n"); break;
         }
 
         for(i=0;i<MAXCHILDREN;i++)
