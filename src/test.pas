@@ -13,7 +13,7 @@ c:=a*b;
 writeln(c);
 c:=a/b;
 writeln(c);
-if c<0.1 then
+if c<0 then
  writeln(123)
 else
  writeln(0);
@@ -27,7 +27,6 @@ if c=-0.666667 then
  writeln(666)
 else 
 begin
- writeln(111);
  writeln(999);
 end;
 
@@ -36,7 +35,12 @@ writeln(i);
 j:=-3;
 writeln(j);
 z:=i*j;
-writeln(z);
+writeln(z);	
 z:=i mod j;
 writeln(z);
+
+if i < j then
+ writeln(123456)
+else
+ writeln(654321);
 end.
