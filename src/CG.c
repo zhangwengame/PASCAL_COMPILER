@@ -24,7 +24,7 @@ void HandleExpOp(TreeNode* pnode){
 		EMITCODE("pushl %eax\n");
 
 
-		if ((pnode->child[0])->RuningType != (pnode->child[1])->RuningType){
+		if ((pnode->child[0]->RuningType>EXPTYPE_REAL||pnode->child[0]->RuningType>EXPTYPE_REAL)&&(pnode->child[0]->RuningType != (pnode->child[1])->RuningType)){
 			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
  				ErrorHandler(ERROR_TYPE_MISMATCH, pnode);
  			}
@@ -90,7 +90,7 @@ void HandleExpOp(TreeNode* pnode){
 		case TOKEN_GE:
 			EMITCODE("cmpl %ebx, %eax\n");
 			EMITCODE("movl $0, %eax\n");
-			EMITCODE("setnlb %eax\n");
+			EMITCODE("setnlb %al\n");
 			break;
 		case TOKEN_EQUAL:
 			EMITCODE("cmpl %ebx, %eax\n");
@@ -440,7 +440,7 @@ void HandleAssignStmt(TreeNode* pnode){
  			}		
  			return;
 		}
-		if (r_ssfuc&&l_ssvar->type!=r_ssfuc->retType){
+		if (r_ssfuc&&l_ssvar->type<r_ssfuc->retType){
 			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
 				ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
 				//pnode->child[0]->ERROR_STATE=ERROR_TYPE_MISMATCH;
@@ -448,8 +448,8 @@ void HandleAssignStmt(TreeNode* pnode){
 			}
 			return;
 		}
-		else if (!r_ssfuc&&(l_ssvar->type<5)&&l_ssvar->type!=pnode->child[1]->RuningType){
-			printf("%d,%d\n",l_ssvar->type,pnode->child[1]->RuningType);
+		else if (!r_ssfuc&&(l_ssvar->type<5)&&l_ssvar->type<pnode->child[1]->RuningType){
+			//printf("%d,%d\n",l_ssvar->type,pnode->child[1]->RuningType);
 			//printf("%d,%d\n",pnode->child[0]->ERROR_STATE,pnode->child[1]->ERROR_STATE);
 			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
 				ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
