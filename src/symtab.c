@@ -399,7 +399,7 @@ VariableList varListLookup(char* name) {
 
 /*funcListLookup returns the FuncList of that name or null if not found*/
 FuncList funcListLookup(char* name) {
-	printf("here1\n");
+	//printf("here1\n");
 	int h = hash(name);
 	FuncList l = funcHashTable[h];
 	while((l != NULL) && (strcmp(name, l->name)))

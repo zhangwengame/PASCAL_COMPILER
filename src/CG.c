@@ -90,7 +90,7 @@ void HandleExpOp(TreeNode* pnode){
 		case TOKEN_GE:
 			EMITCODE("cmpl %ebx, %eax\n");
 			EMITCODE("movl $0, %eax\n");
-			EMITCODE("setnlb %eax\n");
+			EMITCODE("setnlb %al\n");
 			break;
 		case TOKEN_EQUAL:
 			EMITCODE("cmpl %ebx, %eax\n");
