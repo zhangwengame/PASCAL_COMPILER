@@ -723,10 +723,10 @@ void HandleOutStmt(TreeNode* pnode){
 			EMITCODE("subl $4, %esp\n");
 			EMITCODE("fstpl (%esp)\n");
 			if  (pnode->attr.op==TOKEN_WRITELN){
-				EMITCODE("pushl $.PRINTF_F_N\n");
+				EMITCODE("pushl $.OUTPUT_F_N\n");
 			}
 			else {
-				EMITCODE("pushl $.PRINTF_F\n");
+				EMITCODE("pushl $.INOUT_F\n");
 			}
 			EMITCODE("call printf\n");
 			EMITCODE("addl $8, %esp\n");
@@ -737,14 +737,14 @@ void HandleOutStmt(TreeNode* pnode){
 			EMITCODE("pusha\n");
 			if  (pnode->attr.op==TOKEN_WRITELN){
 				EMITCODE("pushl %eax\n");
-				EMITCODE("pushl $.PRINTF_I_N\n");
+				EMITCODE("pushl $.OUTPUT_I_N\n");
 				EMITCODE("call printf\n");
 				EMITCODE("addl $8, %esp\n");				
 				// EMITCODE("invoke printf,offset lb_writeln_int, %eax\n");
 			}
 			else{
 				EMITCODE("pushl %eax\n");
-				EMITCODE("pushl $.PRINTF_I\n");
+				EMITCODE("pushl $.INOUT_I\n");
 				EMITCODE("call printf\n");
 				EMITCODE("addl $8, %esp\n");	
 				// EMITCODE("invoke printf,offset lb_write_int, %eax\n");
@@ -762,30 +762,39 @@ void HandleInStmt(TreeNode* pnode){
 	TreeNode *tt=NULL;
 
 	char output[100];
-	char output_all[100];
-	strcpy(output, "invoke crt_scanf, addr lb_read_");//	int_write,eax\n");
 
 //	if (pnode->child[0]!=NULL)
 	tt=pnode->child[0];
 
 	while (tt!=NULL){
-		CGNodeExpression(tt);
+		// printf("\n%d\n", tt->kind);
 		
-		output_all[0]=0;
-		strcpy(output_all,output);
+		CGNodeExpression(tt);
+		/* 
+		 As the above line generate the value of the token value,
+		 yet the function scanf require the address of the variable 
+		 So we need to move the address register to %eax
+		 */
+		EMITCODE("movl %esi, %eax\n");
+
 
 		if (tt->RuningType==EXPTYPE_INT)
-			strcat(output_all,"int, addr lb_tmp\n");
+			strcpy(output,"pushl $.INOUT_I\n");
 		else if (tt->RuningType==EXPTYPE_REAL)
-			strcat(output_all,"real, addr lb_tmp\n");
+			strcpy(output,"pushl $.INOUT_F\n");
 
 		EMITCODE("pusha\n");
-		EMITCODE(output_all);
+		EMITCODE("pushl %eax\n");
+		EMITCODE(output);
+		EMITCODE("call scanf\n");
+		EMITCODE("addl $8, %esp\n")
 		EMITCODE("popa\n");
-		EMITCODE("movl %eax, dword ptr lb_tmp\n");			// UNDONE
-		EMITCODE("movl %eax, (%esi)\n");
+		// EMITCODE("movl %eax, dword ptr lb_tmp\n");			// UNDONE
+		// EMITCODE("movl %eax, (%esi)\n");
+		// printf(output_all);
 		tt=tt->sibling;
 	}
+	
 	
 }
 
@@ -973,13 +982,13 @@ EMITCODE("main:\n");
 	// EMITDATA("printf  proto C:dword,:dword\n");
 
 	// EMITDATA(".data\n");
-	EMITDATA(".PRINTF_I:\n");
+	EMITDATA(".INOUT_I:\n");
 	EMITDATA("\t.string \"%i\"\n");
-	EMITDATA(".PRINTF_I_N:\n");
+	EMITDATA(".OUTPUT_I_N:\n");
 	EMITDATA("\t.string \"%i\\n\"\n");
-	EMITDATA(".PRINTF_F:\n");
+	EMITDATA(".INOUT_F:\n");
 	EMITDATA("\t.string \"%f\"\n");
-	EMITDATA(".PRINTF_F_N:\n");
+	EMITDATA(".OUTPUT_F_N:\n");
 	EMITDATA("\t.string \"%f\\n\"\n");
 	// EMITDATA("lb_write_int db '%d',0\n");
 	// EMITDATA("lb_writeln_int db '%d',0ah,0dh,0\n");
