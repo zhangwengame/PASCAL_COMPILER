@@ -130,9 +130,9 @@ program ex;
 		until (a > 0) and (b > 0) and(a < b);
 
 
-
-
-
+		writeln(123456789);
+		writeln("a");
+		writeln(123456789);
 		writeln(a);
 		a:= 1;
 		b:= 30;
