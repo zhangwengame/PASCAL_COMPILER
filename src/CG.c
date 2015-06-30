@@ -734,21 +734,36 @@ void HandleOutStmt(TreeNode* pnode){
 			EMITCODE("popa\n");
 		}
 		else if (tt->RuningType==EXPTYPE_INT){
+			char output[30];			
 			EMITCODE("pusha\n");
-			if  (pnode->attr.op==TOKEN_WRITELN){
-				EMITCODE("pushl %eax\n");
-				EMITCODE("pushl $.OUTPUT_I_N\n");
-				EMITCODE("call printf\n");
-				EMITCODE("addl $8, %esp\n");				
-				// EMITCODE("invoke printf,offset lb_writeln_int, %eax\n");
+			if (tt->type == EXPTYPE_CHAR){
+				if  (pnode->attr.op==TOKEN_WRITELN)
+					strcpy(output, "pushl $.OUTPUT_C_N\n");
+				else
+					strcpy(output, "pushl $.INOUT_C\n");
 			}
 			else{
-				EMITCODE("pushl %eax\n");
-				EMITCODE("pushl $.INOUT_I\n");
-				EMITCODE("call printf\n");
-				EMITCODE("addl $8, %esp\n");	
-				// EMITCODE("invoke printf,offset lb_write_int, %eax\n");
-			}
+				if  (pnode->attr.op==TOKEN_WRITELN){
+					// EMITCODE("pushl %eax\n");
+					strcpy(output, "pushl $.OUTPUT_I_N\n");
+					// EMITCODE("pushl $.OUTPUT_I_N\n");
+					// EMITCODE("call printf\n");
+					// EMITCODE("addl $8, %esp\n");				
+					// EMITCODE("invoke printf,offset lb_writeln_int, %eax\n");
+				}
+				else{
+					// EMITCODE("pushl %eax\n");
+					strcpy(output, "pushl $.INOUT_I\n");
+					// EMITCODE("pushl $.INOUT_I\n");
+					// EMITCODE("call printf\n");
+					// EMITCODE("addl $8, %esp\n");	
+					// EMITCODE("invoke printf,offset lb_write_int, %eax\n");
+				}
+			}		
+			EMITCODE("pushl %eax\n");
+			EMITCODE(output);
+			EMITCODE("call printf\n");
+			EMITCODE("addl $8, %esp\n");
 			EMITCODE("popa\n");
 		}
 		tt=tt->sibling;
@@ -986,6 +1001,12 @@ EMITCODE("main:\n");
 	EMITDATA("\t.string \"%i\"\n");
 	EMITDATA(".OUTPUT_I_N:\n");
 	EMITDATA("\t.string \"%i\\n\"\n");
+
+	EMITDATA(".INOUT_C:\n");
+	EMITDATA("\t.string \"%c\"\n");
+	EMITDATA(".OUTPUT_C_N:\n");
+	EMITDATA("\t.string \"%c\\n\"\n");
+
 	EMITDATA(".INOUT_F:\n");
 	EMITDATA("\t.string \"%f\"\n");
 	EMITDATA(".OUTPUT_F_N:\n");

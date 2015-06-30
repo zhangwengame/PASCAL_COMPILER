@@ -56,6 +56,9 @@ program ex;
 		end;
 
 	begin
+		writeln(1.555);
+		writeln('a');
+		writeln(1.555);
 		a := 20 + 8;
 		b := 30 + 700;
 		i := (a + b) + 2 * (a + b);
