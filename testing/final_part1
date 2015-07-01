@@ -1,4 +1,4 @@
-program ex_7;
+program ex;
 	type
 		arr = array[1..50] of integer;
 		date = record
@@ -25,7 +25,7 @@ program ex_7;
 			k,sum : integer;
 		begin
 			sum := 1;
-			for k:=2 to x div 2 do
+			for k:=2 to x / 2 do
 			begin
 				if x mod k=0 then 
 					begin
@@ -34,19 +34,18 @@ program ex_7;
 			end;
 					testfunc := x + y; 
 		end;
-	function t1(x:integer):boolean;
+	function t(x:integer):boolean;
 		begin
-			write("x=");
+			
 			writeln(x);
-			t1 := x > 0;
+			t := x > 0;
 		end;
-
 	function perfect(x:integer):boolean;
 		var
 			k, sum : integer;
-		begin
+		begin			
 			sum := 1;
-			for k:=2 to x div 2 do
+			for k:=2 to x / 2 do
 			begin
 				if (x mod k) = 0 then 
 					begin
@@ -55,18 +54,18 @@ program ex_7;
 			end;
 			perfect := x=sum;
 		end;
-	begin
 
+	begin
 		a := 20 + 8;
 		b := 30 + 700;
 		i := (a + b) + 2 * (a + b);
 
 		i := i - 3;
-		write("i = ");
+		
 		writeln(i);
 
-		i := b div 2;
-		write("i = ");
+		i := b / 2;
+		
 		writeln(i);
 
 		a := 3;
@@ -74,22 +73,20 @@ program ex_7;
 		inta := intb + intc;
 		intb := 2;
 		intd := intb + intc;
-
-		i := -3;
 		
-
-		t := perfect(12);
-
-		write("t = ");
+		i := -3;
+		if (i > 0) then 
+			i:=0
+		else t := perfect(12);
 		writeln(t);
 
 		i := 3;
-		write("i = ");
+		
 		writeln(i);
 
 		i := testfunc(a, b);
 
-		write("i = ");
+		
 		writeln(i);
 
 		a := 30;
@@ -97,41 +94,48 @@ program ex_7;
 		
 	
 		repeat
-			write("a = ");
+			
 			writeln(a);
-			write("b = ");
+			
 			writeln(b);
 			a := a + 1;
 		until (a > b);
 
 		for a := 30 to 40 do
 		begin
-			write("a = ");
+			
 			writeln(a);
 			a := a + 1;
 		end;
 
-		write("a = ");
-		writeln(a);
-
 		for a := 40 downto 30 do
 		begin
-			write("a = ");
+			
 			writeln(a);
 			b := a + 1;
 		end;
 
-		writeln("please input a and b");
+		writeln(111);
+
+
+
 		repeat 
-				readln(a);
-				write("you input a =");
+				
+				a := a-1;
+				read(a);		
 				writeln(a);
-				readln(b);
-				write("you input b =");
+				
+				b := b-1;
 				writeln(b);
 		until (a > 0) and (b > 0) and(a < b);
-		
-		writeln("List of all perfect numbers:");
+
+
+		writeln(123456789);
+		writeln("a");
+		writeln(123456789);
+		writeln(a);
+		a:= 1;
+		b:= 30;
 
 		for i:=a to b do
 			if perfect(i) then writeln(i);
@@ -149,9 +153,9 @@ program ex_7;
 				end;
 		end;
 
-		write("i = ");
-		writeln(i);
 
+		writeln(i);
+		writeln(11111111);
 		a := 0;
 		b := 10;
 
@@ -159,14 +163,13 @@ program ex_7;
 		while a <= 10 do
 		begin
 			b := b + 1;
-			write("b =");
+			
 			writeln(b);
 			a := a + 1;
 		end;
-		write("b =");
+		
 		writeln(b);
 
-		
 		for i:=1 to 50 do
 			aa[i] := -i;
 
@@ -175,33 +178,23 @@ program ex_7;
 		for i := 50 downto aa[40] do
 		begin
 			write(aa[i]);
-			write(' ');
+			
 		end;
+
 
 		dt.year := 2007;
 		dt.month := 11;
 
-		write("dt.year=");
-		writeln(dt.year);
-		write("dt.month=");
-		writeln(dt.month);
-
-
-		aage := 23;
-		aage := 500;
-		write("age=");
-		writeln(aage);
-
+		
 		i := -3;
 
-		write("i = ");
+		
 		writeln(i);
 
 		achar := 'a';
 		achar := achar + 1;
 
-		write("achar =");
+		
 		write(achar);
 
-end.
-
+	end.

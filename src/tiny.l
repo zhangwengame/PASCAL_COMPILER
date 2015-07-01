@@ -9,7 +9,7 @@ digit [0-9]
 real {digit}+\.{digit}+
 number {digit}+
 letter [a-zA-Z]
-identifier {letter}+
+identifier [_a-zA-Z][_a-zA-Z0-9]*
 newline \n
 whitespace [ \t]+
 char \'.\'
@@ -28,6 +28,7 @@ string \".*\"
 "downto"    {return TOKEN_DOWNTO;}
 "for"       {return TOKEN_FOR;}
 "read"      {return TOKEN_READ;}
+"readln"    {return TOKEN_READ;}
 "write"     {return TOKEN_WRITE;}
 "writeln"   {return TOKEN_WRITELN;}
 "abs"       {return TOKEN_ABS;}
@@ -60,7 +61,8 @@ string \".*\"
 "<="        {return TOKEN_LE;}
 "<"         {return TOKEN_LT;}
 "*"         {return TOKEN_MUL;}
-"/"        {return TOKEN_DIV;}
+"/"         {return TOKEN_DIV;}
+"div"       {return TOKEN_DIV;}
 "mod"       {return TOKEN_MOD;}
 "and"       {return TOKEN_AND;}
 "not"       {return TOKEN_NOT;}

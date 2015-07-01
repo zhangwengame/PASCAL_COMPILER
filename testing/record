@@ -8,8 +8,8 @@ var
  student:stu;
 
 begin
-student.num:=5;
-student.price:=1.2;
+student.num:=313;
+student.price:=9.876;
 writeln(student.num);
 writeln(student.price);
 end.
