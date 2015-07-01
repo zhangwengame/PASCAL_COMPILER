@@ -1,4 +1,4 @@
-program ex;
+program ex_7;
 	type
 		arr = array[1..50] of integer;
 		date = record
@@ -34,11 +34,11 @@ program ex;
 			end;
 					testfunc := x + y; 
 		end;
-	function t(x:integer):boolean;
+	function t1(x:integer):boolean;
 		begin
 			write("x=");
 			writeln(x);
-			t := x > 0;
+			t1 := x > 0;
 		end;
 
 	function perfect(x:integer):boolean;
@@ -186,7 +186,7 @@ program ex;
 		write("dt.month=");
 		writeln(dt.month);
 
-		
+
 		aage := 23;
 		aage := 500;
 		write("age=");
