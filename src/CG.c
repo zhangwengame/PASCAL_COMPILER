@@ -313,32 +313,43 @@ void HandleExpId(TreeNode* pnode){
 
 void HandleConstExp(TreeNode* pnode){
 	char const_real_data[100];	
-
+	char const_string_data[100];
 	switch (pnode->type){
 		case EXPTYPE_INT:
 			sprintf(tmp, "movl $%d, %%eax\t# calculate int ExpConst \n", pnode->attr.val);
 			EMITCODE(tmp);		
-			pnode->RuningType=EXPTYPE_INT;
+			pnode->RuningType = EXPTYPE_INT;
 			break;
 		case EXPTYPE_CHAR:
 			sprintf(tmp, "movl $%d, %%eax\t# calculate char ExpConst \n", pnode->attr.char_val);
 			EMITCODE(tmp);
-			pnode->RuningType=EXPTYPE_INT;
+			pnode->RuningType = EXPTYPE_INT;
 			break;
 		case EXPTYPE_BOOL:
 			sprintf(tmp, "movl $%d, %%eax\t# calculate bool ExpConst \n", pnode->attr.val);
 			EMITCODE(tmp);
-			pnode->RuningType=EXPTYPE_INT;
+			pnode->RuningType = EXPTYPE_INT;
 			break;
 		case EXPTYPE_REAL:
-			strcpy(const_real_data, GetDataLabel());	
-			sprintf(tmp, ".%s:\n\t.float %lf\n",const_real_data, pnode->attr.real_val);							// UNDONE
+			strcpy(const_real_data, GetDataLabel());
+			sprintf(tmp, ".%s:\n\t.float %lf\n", const_real_data, pnode->attr.real_val);
 		    EMITDATA(tmp);
-        	sprintf(tmp,"movl $.%s, %%ebx\t# calculate real ExpConst \n",const_real_data); 	// UNDONE
+        	sprintf(tmp,"movl $.%s, %%ebx\t# calculate real ExpConst \n", const_real_data);
         	EMITCODE(tmp);
         	EMITCODE("movl (%ebx), %eax\n");			// Make const pointer the const value
-        	pnode->RuningType=EXPTYPE_REAL;
-			break;			
+        	pnode->RuningType = EXPTYPE_REAL;
+			break;	
+		case EXPTYPE_STRING:							// DONE
+			// printf("i see a const string\n");
+			// printf("%s\n", pnode->attr.string_val);
+			strcpy(const_string_data, GetDataLabel());
+			sprintf(tmp, ".%s:\n\t.string \"%s\"\n", const_string_data, pnode->attr.string_val);
+			EMITDATA(tmp);
+			sprintf(tmp,"movl $.%s, %%eax\t# calculate string ExpConst \n", const_string_data);
+			EMITCODE(tmp);
+			// return a pointer to the const string
+			pnode->RuningType = EXPTYPE_STRING;
+			break;
 	}
 }
 
@@ -511,9 +522,9 @@ char* GetDataLabel(){
     static int datalabel_cnt = 0;
     char tmp[100];
     static char datalabel[200];
-    strcpy(datalabel,"_REALNUM");
-    sprintf(tmp,"%d",datalabel_cnt);
-    strcat(datalabel,tmp);
+    strcpy(datalabel, "_CONST_VAR_");
+    sprintf(tmp, "%d", datalabel_cnt);
+    strcat(datalabel, tmp);
     datalabel_cnt++;
     return datalabel;
 }
@@ -742,7 +753,7 @@ void HandleOutStmt(TreeNode* pnode){
 				else
 					strcpy(output, "pushl $.INOUT_C\n");
 			}
-			else{
+			else {
 				if  (pnode->attr.op==TOKEN_WRITELN){
 					// EMITCODE("pushl %eax\n");
 					strcpy(output, "pushl $.OUTPUT_I_N\n");
@@ -764,6 +775,19 @@ void HandleOutStmt(TreeNode* pnode){
 			EMITCODE(output);
 			EMITCODE("call printf\n");
 			EMITCODE("addl $8, %esp\n");
+			EMITCODE("popa\n");
+		}
+		else if (tt->RuningType==EXPTYPE_STRING){
+			char output[30];
+			EMITCODE("pusha\n");
+			if  (pnode->attr.op==TOKEN_WRITELN)
+				strcpy(output, "pushl $.OUTPUT_S_N\n");
+			else
+				strcpy(output, "pushl $.INOUT_S\n");
+			EMITCODE("pushl %eax\n");
+			EMITCODE(output);
+			EMITCODE("call printf\n");
+			EMITCODE("addl $8, %esp\n");		
 			EMITCODE("popa\n");
 		}
 		tt=tt->sibling;
@@ -1011,6 +1035,11 @@ EMITCODE("main:\n");
 	EMITDATA("\t.string \"%f\"\n");
 	EMITDATA(".OUTPUT_F_N:\n");
 	EMITDATA("\t.string \"%f\\n\"\n");
+
+	EMITDATA(".INOUT_S:\n");
+	EMITDATA("\t.string \"%s\"\n");
+	EMITDATA(".OUTPUT_S_N:\n");
+	EMITDATA("\t.string \"%s\\n\"\n");
 	// EMITDATA("lb_write_int db '%d',0\n");
 	// EMITDATA("lb_writeln_int db '%d',0ah,0dh,0\n");
 	// EMITDATA("lb_write_real db '%lf',0\n");
