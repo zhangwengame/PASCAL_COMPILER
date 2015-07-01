@@ -13,9 +13,9 @@ begin
 end;
 
 begin
-i:=10;
-j:=5;
+i:=100;
+j:=25;
 swap(i,j);
-write(i);
-write(j);
+writeln(i);
+writeln(j);
 end.

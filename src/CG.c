@@ -56,6 +56,9 @@ void HandleExpOp(TreeNode* pnode){
 		EMITCODE("popl %eax\n");
 		switch(pnode->attr.op)
 		{
+		case TOKEN_AND:
+			EMITCODE("andl %ebx, %eax\n");
+			break;
 		case TOKEN_PLUS:
 			EMITCODE("addl %ebx, %eax\n");
 			break;
