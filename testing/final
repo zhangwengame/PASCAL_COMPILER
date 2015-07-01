@@ -77,6 +77,10 @@ program ex_7;
 
 		i := -3;
 		
+		if (i >0) then writeln("i > 0")
+		else if (i = 0) then writeln("i = 0")
+		else writeln("i < 0");
+
 
 		t := perfect(12);
 
