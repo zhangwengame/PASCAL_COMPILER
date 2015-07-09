@@ -3,33 +3,28 @@
 
 #include "global.h"
 
-/*array/record lookup return type*/
 typedef struct LookupRetRec {
 	int totalOff;
 	int jumpLevel;
 	ExpType type;
 } LookupRet;
 
-/*record memory location*/
 typedef struct MemLocRec {
 	int baseLoc;
 	int offset;
 	ExpType type;
 } MemLoc;	
 
-/*the list of line numbers of the source code in which a variable is referenced*/
 typedef struct LineListRec {
 	int lineno;
 	struct LineListRec* next;
 }* LineList;
 
-/*the list of alias name of the variable or type*/
 typedef struct AliaseListRec {
 	char* aliase;
 	struct AliaseListRec* next;
 }* AliaseList;
 
-/*subBound details*/
 typedef union {
 	int i;
 	char c;
@@ -42,54 +37,48 @@ typedef struct SubBoundDefRec {
 	Bound UpperBound;
 }* SubBoundDef;
 
-/*array details*/
 typedef struct ArrayDefRec {
 	ExpType arrayType;
 	SubBoundDef subBound;
 }* ArrayDef;
 
-/*enum detail*/
 typedef struct EnumDefRec {
-	char* mark; /*point to a constant value*/
+	char* mark;
 	struct EnumDefRec* next;		
 }* EnumDef;
 
-/*record detail*/
 typedef enum {ANONYMOUS, DEFINED} RecordType;
 
 typedef struct RecordNodeRec {
 	RecordType type;
 	union {
-		struct TypeListRec* pDef; /*pDef point to the definition in TypeList*/
-		struct TypeListRec* pAnony; /*pAnonymous point to the anonymous record type*/
+		struct TypeListRec* pDef;
+		struct TypeListRec* pAnony;
 	} ptr;
 	struct RecordDefRec* next;
 }* RecordDef;
 
-/*record the definition of each type*/
 typedef struct TypeListRec {
 	char* name;
 	AliaseList aliaseSet;
 	ExpType type;
 	int nestLevel;
 	int size;
-	void* pAttr; /*pAttr point to the definition detail when type is enum, array or record, otherwise null*/
+	void* pAttr; 
 	struct TypeListRec* next;
 }* TypeList;
 
-/*record the definition of each variable*/
 typedef struct VariableListRec {
 	char* name;
 	ExpType type;
 	int isConst;
 	int nestLevel;
-	void* pAttr; /*pAttr point to the definition detail when type is enum, array or record, otherwise null*/	
+	void* pAttr; 
 	LineList lines;
 	MemLoc memloc;
 	struct VariableListRec* next;
 }* VariableList;
 
-/*record the definition of each function*/
 typedef struct SimpleTypeListRec {
 	char* name;
 	ExpType type;
@@ -100,12 +89,11 @@ typedef struct SimpleTypeListRec {
 typedef struct FuncListRec {
 	char* name;
 	SimpleTypeList paraList;
-	ExpType retType; /*record the return type*/
+	ExpType retType; 
 	int nestLevel;
 	struct FuncListRec* next;
 }* FuncList;
 
-/*record the definition of each process*/
 typedef struct ProcListRec {
 	char* name;
 	SimpleTypeList paraList;
@@ -126,13 +114,6 @@ RecordDef newAnonyRecord(TypeList typeList);
 SimpleTypeList newSimpleTypeList(char* name, ExpType type, int isVar);
 SimpleTypeList insertSimpleTypeList(SimpleTypeList simpleList, char* name, ExpType type, int isVar); 
 
-int procListInsert(TreeNode* procHead);
-int funcListInsert(TreeNode* funcHead);
-void typeListAliaseInsert(char* name, char* aliase);
-void typeListInsert(char* name, ExpType type, int nestLevel, void* pAttr, int size);
-void varListInsert(TreeNode * t, char* name, ExpType type, int isConst, int nestLevel, void* pAttr, int lineno, int baseLoc, int offset);
-
-
 VariableList varListLookup(char* name);
 FuncList funcListLookup(char* name);
 ProcList procListLookup(char* name);
@@ -144,5 +125,10 @@ int enterNewScope(TreeNode* t);
 int leaveScope();
 void printSymTab(FILE* listing);
 
+int procListInsert(TreeNode* procHead);
+int funcListInsert(TreeNode* funcHead);
+void typeListAliaseInsert(char* name, char* aliase);
+void typeListInsert(char* name, ExpType type, int nestLevel, void* pAttr, int size);
+void varListInsert(TreeNode * t, char* name, ExpType type, int isConst, int nestLevel, void* pAttr, int lineno, int baseLoc, int offset);
 
 #endif
