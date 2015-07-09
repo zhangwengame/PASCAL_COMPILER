@@ -386,7 +386,7 @@ void HandleFuncExc(TreeNode* pnode){
 
 	FuncList judge_var=funcListLookup(pnode->attr.name);
 
-	EMITCODE("pushl %eax\n");  // pushl return value	
+	EMITCODE("pushl %eax\n");  // pushl return value into the stack 
 
 	PushParam(pnode->child[0]);
 
@@ -402,7 +402,7 @@ void HandleFuncExc(TreeNode* pnode){
 
 	PopParam(pnode->child[0],judge_var->paraList);
 
-	EMITCODE("popl %eax\n");  // popl return value
+	EMITCODE("popl %eax\n");  // popl return value to %eax
 
 }
 
@@ -472,7 +472,15 @@ void HandleAssignStmt(TreeNode* pnode){
 			}
 			return;
 		}
-		else{
+		else if (l_ssvar->type==EXPTYPE_REAL&&(pnode->child[1]->RuningType!=EXPTYPE_REAL)){
+			GenCode(pnode->child[0]);			
+			EMITCODE("fildl 0(%esp)\n");
+			EMITCODE("fstps 0(%esp)\n");			// make integer into float
+			EMITCODE("popl %eax\n");
+			EMITCODE("movl %eax, -0(%esi)\t# assign\n");
+		}
+		else 
+		{
 		GenCode(pnode->child[0]);
 		EMITCODE("popl %eax\n");
 		EMITCODE("movl %eax, -0(%esi)\t# assign\n");
@@ -555,7 +563,7 @@ void HandleCaseStmt(TreeNode* pnode){
 	strcpy(case_end, GetLabel());	
 
 	GenCode(pnode->child[0]);
-	EMITCODE("pushl %eax\n");
+	EMITCODE("pushl %eax\n");		// push case expression into stack
 	GenCode(pnode->child[1]);
 
 }
@@ -568,9 +576,9 @@ void HandleCaseExp(TreeNode* pnode){
 	GenCode(pnode->child[0]);
 	
 	EMITCODE("popl %ebx\n");
-	EMITCODE("cmpl %ebx,%eax\n");
+	EMITCODE("cmpl %ebx,%eax\n");			// integer compare
 
-	sprintf(tmp, "jne %s\n", case_end);  //unequal
+	sprintf(tmp, "jne %s\n", case_end);  	// jump not equal
 	EMITCODE(tmp);
 
 	GenCode(pnode->child[1]);
