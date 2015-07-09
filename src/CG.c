@@ -688,22 +688,19 @@ void HandleProcExc(TreeNode* pnode){
 	PopParam(pnode->child[0],judge_var->paraList);
 }
 
-void HandleProcExc(TreeNode* pnode){
+void HandleRepeatStmt(TreeNode* pnode){
+	char repeat_start[100];
+	strcpy(repeat_start, GetLabel());
+	
+	sprintf(tmp,"%s:\n",repeat_start);
+	EMITCODE(tmp);	
 
-	ProcList judge_var=procListLookup(pnode->attr.name);
+	GenCode(pnode->child[0]);
+	GenCode(pnode->child[1]);
 
-	PushParam(pnode->child[0]);
-
-
-	EMITCODE("pushl %ecx\n");  
-	EMITCODE("movl %esp, %ecx\n");
-
-	sprintf(tmp, "call %s\n", pnode->attr.name);
+	EMITCODE("cmpl $0, %eax\n");
+	sprintf(tmp,"je %s\n",repeat_start);
 	EMITCODE(tmp);
-
-	EMITCODE("popl %ecx\n");
-
-	PopParam(pnode->child[0],judge_var->paraList);
 }
 
 void HandleWhileStmt(TreeNode* pnode){
