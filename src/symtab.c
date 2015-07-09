@@ -385,7 +385,9 @@ void varListInsert(TreeNode* t, char* name, ExpType type, int isConst, int nestL
 
 /*varListLookup returns the VariableList or null if not found*/
 VariableList varListLookup(char* name) {
+	puts("7777");
 	int h = hash(name);
+	puts("9999");
 	VariableList l = variableHashTable[h];
 	while((l != NULL) && (strcmp(name, l->name)))
 		l = l->next;

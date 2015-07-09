@@ -35,8 +35,8 @@ i:=2;
 writeln(i);
 j:=-3;
 writeln(j);
-z:=i*j;
-writeln(z);
+c:=i*j;
+writeln(c);
 z:=i mod j;
 writeln(z);
 end.

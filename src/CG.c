@@ -14,32 +14,49 @@ char tmp[200];
 
 void HandleExpOp(TreeNode* pnode){
 
-	
+	VariableList lsvar, rsvar;
+	int bothConst;
+	char const_real_data[100];
 	if (pnode->child[0]!=NULL && pnode->child[1]!=NULL){
-		GenCode(pnode->child[0]);
-		EMITCODE("pushl %eax\n");
-	
 
-		GenCode(pnode->child[1]);
-		EMITCODE("pushl %eax\n");
+		// puts("11112222");
+		// lsvar = varListLookup(pnode->child[0]->attr.name);
+		// puts("2233");
+		// rsvar = varListLookup(pnode->child[1]->attr.name);
+		// puts("2323");
+		// if (lsvar->isConst == 1 && rsvar->isConst == 1){
+		// pnode->kind+(NODE_EXPRESSION<<4)
+		if ((pnode->child[0])->kind+(NODE_EXPRESSION<<4) == EXP_CONST && (pnode->child[0])->kind+(NODE_EXPRESSION<<4) == EXP_CONST){
+			bothConst = 1;
+			puts("22223");
+		}
+		else {
+			GenCode(pnode->child[0]);
+			EMITCODE("pushl %eax\n");
+		
+
+			GenCode(pnode->child[1]);
+			EMITCODE("pushl %eax\n");
 
 
-		if ((pnode->child[0]->RuningType>EXPTYPE_REAL||pnode->child[0]->RuningType>EXPTYPE_REAL)&&(pnode->child[0]->RuningType != (pnode->child[1])->RuningType)){
-			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
- 				ErrorHandler(ERROR_TYPE_MISMATCH, pnode);
- 			}
- 			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
- 			return;			
- 		}
- 		else if (pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE){
- 			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
- 			return;
- 		}
- 		
-		if ((pnode->child[0])->RuningType==EXPTYPE_REAL && (pnode->child[1])->RuningType==EXPTYPE_REAL)
-			pnode->RuningType=EXPTYPE_REAL;
-		if ((pnode->child[0])->RuningType==EXPTYPE_INT && (pnode->child[1])->RuningType==EXPTYPE_INT)
-			pnode->RuningType=EXPTYPE_INT; 
+			if ((pnode->child[0]->RuningType>EXPTYPE_REAL||pnode->child[0]->RuningType>EXPTYPE_REAL)&&(pnode->child[0]->RuningType != (pnode->child[1])->RuningType)){
+				if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
+	 				ErrorHandler(ERROR_TYPE_MISMATCH, pnode);
+	 			}
+	 			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
+	 			return;			
+	 		}
+	 		else if (pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE){
+	 			pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
+	 			return;
+	 		}
+	 		
+			if ((pnode->child[0])->RuningType==EXPTYPE_REAL && (pnode->child[1])->RuningType==EXPTYPE_REAL)
+				pnode->RuningType=EXPTYPE_REAL;
+			if ((pnode->child[0])->RuningType==EXPTYPE_INT && (pnode->child[1])->RuningType==EXPTYPE_INT)
+				pnode->RuningType=EXPTYPE_INT; 
+		}
+		
 
 	}
 	else {
@@ -49,9 +66,126 @@ void HandleExpOp(TreeNode* pnode){
 		pnode->RuningType=(pnode->child[0])->RuningType;
 	}
 
+	puts("11111");
+	if (pnode->child[0]!=NULL && pnode->child[1]!=NULL && bothConst == 1){
+		puts("2222");
+		if ((pnode->child[0])->type == EXPTYPE_INT){
+			if ((pnode->child[1])->type == EXPTYPE_INT){
+				switch(pnode->attr.op){
+					case TOKEN_AND:
+						pnode->attr.val = (pnode->child[0])->attr.val & (pnode->child[1])->attr.val;
+						sprintf(tmp, "movl $%d, %%eax\t \n", pnode->attr.val);
+						EMITCODE(tmp);					
+						break;
+					case TOKEN_PLUS:
+						pnode->attr.val = (pnode->child[0])->attr.val + (pnode->child[1])->attr.val;
+						sprintf(tmp, "movl $%d, %%eax\t \n", pnode->attr.val);
+						EMITCODE(tmp);
+						break;
+					case TOKEN_MINUS:
+						pnode->attr.val = (pnode->child[0])->attr.val - (pnode->child[1])->attr.val;
+						sprintf(tmp, "movl $%d, %%eax\t \n", pnode->attr.val);
+						EMITCODE(tmp);
+						break;
+					case TOKEN_MUL:
+						pnode->attr.val = (pnode->child[0])->attr.val * (pnode->child[1])->attr.val;
+						sprintf(tmp, "movl $%d, %%eax\t \n", pnode->attr.val);
+						EMITCODE(tmp);
+						break;
+					case TOKEN_DIV:
+						pnode->attr.val = (pnode->child[0])->attr.val / (pnode->child[1])->attr.val;
+						sprintf(tmp, "movl $%d, %%eax\t \n", pnode->attr.val);
+						EMITCODE(tmp);
+						break;
+					default: 
+						printf("compare between const\n");
+						break;				
+				}
+			}
+			else if ((pnode->child[1])->type == EXPTYPE_REAL){
+				switch(pnode->attr.op){
+					case TOKEN_PLUS:
+						pnode->attr.real_val = (pnode->child[0])->attr.val + (pnode->child[1])->attr.real_val;
+						
+						break;
+					case TOKEN_MINUS:
+						pnode->attr.real_val = (pnode->child[0])->attr.val - (pnode->child[1])->attr.real_val;
+						
+						break;
+					case TOKEN_MUL:
+						pnode->attr.real_val = (pnode->child[0])->attr.val * (pnode->child[1])->attr.real_val;
 
+						break;
+					case TOKEN_DIV:
+						pnode->attr.real_val = (pnode->child[0])->attr.val / (pnode->child[1])->attr.real_val;
 
-	if (pnode->RuningType==EXPTYPE_INT){
+						break;
+					default: 
+						printf("compare between const\n");
+						break;				
+				}
+			}
+
+		}
+		else if ((pnode->child[0])->type == EXPTYPE_REAL){
+			if ((pnode->child[1])->type == EXPTYPE_INT){
+				switch(pnode->attr.op){
+					case TOKEN_PLUS:
+						pnode->attr.real_val = (pnode->child[0])->attr.real_val + (pnode->child[1])->attr.val;
+
+						break;
+					case TOKEN_MINUS:
+						pnode->attr.real_val = (pnode->child[0])->attr.real_val - (pnode->child[1])->attr.val;
+
+						break;
+					case TOKEN_MUL:
+						pnode->attr.real_val = (pnode->child[0])->attr.real_val * (pnode->child[1])->attr.val;
+
+						break;
+					case TOKEN_DIV:
+						pnode->attr.real_val = (pnode->child[0])->attr.real_val / (pnode->child[1])->attr.val;
+
+						break;
+					default: 
+						printf("compare between const\n");
+						break;				
+				}
+			}
+			else if ((pnode->child[1])->type == EXPTYPE_REAL){
+				switch(pnode->attr.op){
+					case TOKEN_PLUS:
+						pnode->attr.real_val = (pnode->child[0])->attr.real_val + (pnode->child[1])->attr.real_val;
+
+						break;
+					case TOKEN_MINUS:
+						pnode->attr.real_val = (pnode->child[0])->attr.real_val - (pnode->child[1])->attr.real_val;
+
+						break;
+					case TOKEN_MUL:
+						pnode->attr.real_val = (pnode->child[0])->attr.real_val * (pnode->child[1])->attr.real_val;
+
+						break;
+					case TOKEN_DIV:
+						pnode->attr.real_val = (pnode->child[0])->attr.real_val / (pnode->child[1])->attr.real_val;
+
+						break;
+					default: 
+						printf("compare between const\n");
+						break;				
+				}
+			}					
+		}
+		if ((pnode->child[0])->type != EXPTYPE_INT || (pnode->child[1])->type != EXPTYPE_INT){
+			strcpy(const_real_data, GetDataLabel());
+			sprintf(tmp, ".%s:\n\t.float %lf\n", const_real_data, pnode->attr.real_val);
+		    EMITDATA(tmp);
+        	sprintf(tmp,"movl $.%s, %%ebx\t# calculate real ExpConst \n", const_real_data);
+        	EMITCODE(tmp);
+        	EMITCODE("movl (%ebx), %eax\n");
+		}
+	}
+	else if (pnode->RuningType==EXPTYPE_INT){
+		puts("3333");
 		EMITCODE("popl %ebx\n");
 		EMITCODE("popl %eax\n");
 		switch(pnode->attr.op)
@@ -111,6 +245,7 @@ void HandleExpOp(TreeNode* pnode){
 		// EMITCODE("flds (%esp)\n");		
 		// to be decided
 		//char fcom_lable_false[100], fcom_lable_end[100]; 
+		puts("4444");
 		if (pnode->child[1]!=NULL&&((pnode->child[1])->RuningType == EXPTYPE_INT)){
 			EMITCODE("filds (%esp)\n");	
 		}
