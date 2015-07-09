@@ -56,17 +56,17 @@ void printToken(TokenType token, const char * tokenString){
             fprintf(listing,"writeln\n"); break;            
 
         case TOKEN_EQUAL:   
-            fprintf(listing,"=\n",tokenString); break;
+            fprintf(listing,"= %s\n",tokenString); break;
         case TOKEN_UNEQUAL:   
-            fprintf(listing,"<>\n",tokenString); break;
+            fprintf(listing,"<> %s\n",tokenString); break;
         case TOKEN_GE:   
-            fprintf(listing,">=\n",tokenString); break;
+            fprintf(listing,">= %s\n",tokenString); break;
         case TOKEN_GT:   
-            fprintf(listing,">\n",tokenString); break;
+            fprintf(listing,"> %s\n",tokenString); break;
         case TOKEN_LE:   
-            fprintf(listing,"<=\n",tokenString); break;
+            fprintf(listing,"<= %s\n",tokenString); break;
         case TOKEN_LT:   
-            fprintf(listing,"<\n",tokenString); break;
+            fprintf(listing,"< %s\n",tokenString); break;
         case TOKEN_PLUS:    
             fprintf(listing,"+\n"); break;
         case TOKEN_MINUS:   
