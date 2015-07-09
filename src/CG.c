@@ -13,16 +13,13 @@ char tmp[200];
 
 
 void HandleExpOp(TreeNode* pnode){
-
 	
 	if (pnode->child[0]!=NULL && pnode->child[1]!=NULL){
 		GenCode(pnode->child[0]);
 		EMITCODE("pushl %eax\n");
-	
 
 		GenCode(pnode->child[1]);
 		EMITCODE("pushl %eax\n");
-
 
 		if ((pnode->child[0]->RuningType>EXPTYPE_REAL||pnode->child[0]->RuningType>EXPTYPE_REAL)&&(pnode->child[0]->RuningType != (pnode->child[1])->RuningType)){
 			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
@@ -108,9 +105,6 @@ void HandleExpOp(TreeNode* pnode){
 		}	
 	}
 	else {
-		// EMITCODE("flds (%esp)\n");		
-		// to be decided
-		//char fcom_lable_false[100], fcom_lable_end[100]; 
 		if (pnode->child[1]!=NULL&&((pnode->child[1])->RuningType == EXPTYPE_INT)){
 			EMITCODE("filds (%esp)\n");	
 		}
@@ -140,7 +134,6 @@ void HandleExpOp(TreeNode* pnode){
 			case TOKEN_GT:
 			case TOKEN_GE:
 			case TOKEN_EQUAL:	
-				// EMITCODE("fxch %st(1)\n");			
 				EMITCODE("fucomip %st(1),%st\n");
 				EMITCODE("fstp %st(0)\n");
 				EMITCODE("movl $0x0, %eax\n");
@@ -155,66 +148,23 @@ void HandleExpOp(TreeNode* pnode){
 				EMITCODE("fstps (%esp)\n");
 				EMITCODE("popl %eax\n");	
 				break;
-			case TOKEN_LT:				
-				// if (pnode->attr.op == TOKEN_LT){
-				// 	strcpy(fcom_lable_false, GetLabel());
-				// 	strcpy(fcom_lable_end, GetLabel());
-				// 	sprintf(tmp, "jnb %s\n", fcom_lable_false);
-				// 	EMITCODE(tmp);
-				// }				
+			case TOKEN_LT:							
 				EMITCODE("setb %al\n");
 				break;
 			case TOKEN_LE:			
-				// if (pnode->attr.op == TOKEN_LE){
-				// 	strcpy(fcom_lable_false, GetLabel());
-				// 	strcpy(fcom_lable_end, GetLabel());
-				// 	sprintf(tmp, "jnbe %s\n", fcom_lable_false);
-				// 	EMITCODE(tmp);	
-				// }
 				EMITCODE("setbe %al\n");
 				break;
 			case TOKEN_GT:				
-				// if (pnode->attr.op == TOKEN_GT){
-				// 	strcpy(fcom_lable_false, GetLabel());
-				// 	strcpy(fcom_lable_end, GetLabel());
-				// 	sprintf(tmp, "jna %s\n", fcom_lable_false);
-				// 	EMITCODE(tmp);
-				// }
 				EMITCODE("seta %al\n");
 				break;
 			case TOKEN_GE:				
-				// if (pnode->attr.op == TOKEN_GE){
-				// 	strcpy(fcom_lable_false, GetLabel());
-				// 	strcpy(fcom_lable_end, GetLabel());
-				// 	sprintf(tmp, "jnae %s\n", fcom_lable_false);
-				// 	EMITCODE(tmp);
-				// }
 				EMITCODE("setae %al\n");
 				break;
 			case TOKEN_EQUAL:
-				// if (pnode->attr.op == TOKEN_EQUAL){
-				// 	strcpy(fcom_lable_false, GetLabel());
-				// 	strcpy(fcom_lable_end, GetLabel());
-				// 	sprintf(tmp, "jne %s\n", fcom_lable_false);
-				// 	EMITCODE(tmp);
-				// }
-				// EMITCODE("movl $1, (%esp)\n");
-				// sprintf(tmp, "jmp %s\n", fcom_lable_end);
-				// EMITCODE(tmp);
-				// sprintf(tmp, "%s:\n", fcom_lable_false);
-				// EMITCODE(tmp);
-				// EMITCODE("movl $0, (%esp)\n");
-				// sprintf(tmp, "%s:\n", fcom_lable_end);
-				// EMITCODE(tmp);
 				EMITCODE("sete %al\n");
 				break;
 			default: break;
 		}	
-		
-		// EMITCODE("subl $4, %esp\n");
-		// EMITCODE("fstps (%esp)\n");
-		// EMITCODE("popl %eax\n");
-		
 	}
 }
 
@@ -240,9 +190,7 @@ void HandleExpId(TreeNode* pnode){
 
  	cgtype=ssvar->type;
 
-	if (cgtype==EXPTYPE_ARRAY){  // array of int real bool char
-
-		//st_var=arrayLookup(pnode->attr.name,(pnode->child[0])->attr.val);
+	if (cgtype==EXPTYPE_ARRAY){ 
 		if (ssvar->pAttr==NULL){
 			if (!pnode->ERROR_STATE){
  				ErrorHandler(ERROR_VAR_NOTARRAY, pnode);
@@ -254,15 +202,14 @@ void HandleExpId(TreeNode* pnode){
 		lower=(((ArrayDef)ssvar->pAttr)->subBound)->LowerBound.i;
 		level=ssvar->memloc.baseLoc;
 		offset=ssvar->memloc.offset;
-		//offset=st_var.totalOff;
 
 	}
-	else if (cgtype==EXPTYPE_RECORD){ // record {int real bool char}
+	else if (cgtype==EXPTYPE_RECORD){ 
 		st_var=recordLookup(pnode->attr.name,(pnode->child[0])->attr.name);
 		level=st_var.jumpLevel;
 		offset=st_var.totalOff;
 	}
-	else {	 //int real bool char
+	else {	 
 		level=ssvar->memloc.baseLoc;
 		offset=ssvar->memloc.offset;
 	}
@@ -284,14 +231,14 @@ void HandleExpId(TreeNode* pnode){
 		EMITCODE(tmp);	
 	}
 
-	//printf("%d\n",cgtype);
+
 	if (cgtype==EXPTYPE_ARRAY){ 
 		cgtype=((ArrayDef)ssvar->pAttr)->arrayType;
 	}
 	else if (cgtype==EXPTYPE_RECORD){
 		cgtype=st_var.type;	
 	}		
-	//printf("%d\n",cgtype);
+
 	EMITCODE("movl %ecx, %esi\n");
 	while (level){
 		EMITCODE("movl (%esi), %eax\n");
@@ -304,12 +251,12 @@ void HandleExpId(TreeNode* pnode){
 	if (cgtype==EXPTYPE_INT || cgtype==EXPTYPE_CHAR || cgtype==EXPTYPE_BOOL){
 		EMITCODE("movl (%esi), %eax\t# calculate ExpId \n");
 		pnode->RuningType=EXPTYPE_INT;
-		//printf("EXPTYPE_INT\n");
+
 	}
 	else if (cgtype==EXPTYPE_REAL){
-		EMITCODE("movl (%esi), %eax\n"); 		// TODO: UNDONE
+		EMITCODE("movl (%esi), %eax\n"); 		
 		pnode->RuningType=EXPTYPE_REAL;
-		//printf("EXPTYPE_REAL\n");
+
 	}
 
 }
@@ -339,18 +286,15 @@ void HandleConstExp(TreeNode* pnode){
 		    EMITDATA(tmp);
         	sprintf(tmp,"movl $.%s, %%ebx\t# calculate real ExpConst \n", const_real_data);
         	EMITCODE(tmp);
-        	EMITCODE("movl (%ebx), %eax\n");			// Make const pointer the const value
+        	EMITCODE("movl (%ebx), %eax\n");			
         	pnode->RuningType = EXPTYPE_REAL;
 			break;	
-		case EXPTYPE_STRING:							// DONE
-			// printf("i see a const string\n");
-			// printf("%s\n", pnode->attr.string_val);
+		case EXPTYPE_STRING:							
 			strcpy(const_string_data, GetDataLabel());
 			sprintf(tmp, ".%s:\n\t.string \"%s\"\n", const_string_data, pnode->attr.string_val);
 			EMITDATA(tmp);
 			sprintf(tmp,"movl $.%s, %%eax\t# calculate string ExpConst \n", const_string_data);
 			EMITCODE(tmp);
-			// return a pointer to the const string
 			pnode->RuningType = EXPTYPE_STRING;
 			break;
 	}
@@ -386,12 +330,12 @@ void HandleFuncExc(TreeNode* pnode){
 
 	FuncList judge_var=funcListLookup(pnode->attr.name);
 
-	EMITCODE("pushl %eax\n");  // pushl return value	
+	EMITCODE("pushl %eax\n");  	
 
 	PushParam(pnode->child[0]);
 
 
-	EMITCODE("pushl %ecx\n");  // save access link
+	EMITCODE("pushl %ecx\n");  
 	EMITCODE("movl %esp, %ecx\n");
 
 	sprintf(tmp, "call %s\n", pnode->attr.name);
@@ -402,7 +346,7 @@ void HandleFuncExc(TreeNode* pnode){
 
 	PopParam(pnode->child[0],judge_var->paraList);
 
-	EMITCODE("popl %eax\n");  // popl return value
+	EMITCODE("popl %eax\n");  
 
 }
 
@@ -414,7 +358,7 @@ void HandleProcExc(TreeNode* pnode){
 	PushParam(pnode->child[0]);
 
 
-	EMITCODE("pushl %ecx\n");  // save access link
+	EMITCODE("pushl %ecx\n");  
 	EMITCODE("movl %esp, %ecx\n");
 
 	sprintf(tmp, "call %s\n", pnode->attr.name);
@@ -428,15 +372,12 @@ void HandleProcExc(TreeNode* pnode){
 
 
 void HandleAssignStmt(TreeNode* pnode){
-	//if  (pnode->attr.op==TOKEN_ID){   // x:=1;
 		FuncList r_ssfuc=NULL;
 		VariableList l_ssvar=varListLookup((pnode->child[0])->attr.name);
-		//printf("%d,%d\n",(pnode->child[1])->nodekind,(pnode->child[1])->kind);
 		if ((pnode->child[1])->nodekind==2&&(pnode->child[1])->kind>4)
 			r_ssfuc=funcListLookup((pnode->child[1])->attr.name);
 		GenCode(pnode->child[1]);
 		EMITCODE("pushl %eax\n");
-		//VariableList r_ssvar=funcListLookup((pnode->child[1])->attr.name);
 		if (l_ssvar==NULL){
 			if (!pnode->child[1]->ERROR_STATE){
  			ErrorHandler(ERROR_VAR_MISS, (pnode->child[0]));
@@ -444,12 +385,10 @@ void HandleAssignStmt(TreeNode* pnode){
  			pnode->ERROR_STATE=ERROR_VAR_MISS;
  			}
  			return;
-			//printf("here2\n");
 		}
 		else if (l_ssvar->isConst){
 			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
  			ErrorHandler(ERROR_VAR_MODIFYCONST, (pnode->child[0]));
- 			//pnode->child[0]->ERROR_STATE=ERROR_VAR_MODIFYCONST;
  			pnode->ERROR_STATE=ERROR_VAR_MODIFYCONST;
  			}		
  			return;
@@ -457,17 +396,13 @@ void HandleAssignStmt(TreeNode* pnode){
 		if (r_ssfuc&&l_ssvar->type<r_ssfuc->retType){
 			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
 				ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
-				//pnode->child[0]->ERROR_STATE=ERROR_TYPE_MISMATCH;
  				pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
 			}
 			return;
 		}
 		else if (!r_ssfuc&&(l_ssvar->type<5)&&l_ssvar->type<pnode->child[1]->RuningType){
-			//printf("%d,%d\n",l_ssvar->type,pnode->child[1]->RuningType);
-			//printf("%d,%d\n",pnode->child[0]->ERROR_STATE,pnode->child[1]->ERROR_STATE);
 			if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
 				ErrorHandler(ERROR_TYPE_MISMATCH,pnode);
-				//pnode->child[0]->ERROR_STATE=ERROR_TYPE_MISMATCH;
  				pnode->ERROR_STATE=ERROR_TYPE_MISMATCH;
 			}
 			return;
@@ -477,26 +412,6 @@ void HandleAssignStmt(TreeNode* pnode){
 		EMITCODE("popl %eax\n");
 		EMITCODE("movl %eax, -0(%esi)\t# assign\n");
 		}
-	/*}
-	else if (pnode->attr.op==TOKEN_ARRAY){ //x[1]:=1
-		GenCode(pnode->child[2]);
-		EMITCODE("pushl %eax\n");
-		GenCode(pnode->child[1]);
-		EMITCODE("pushl %eax\n");
-		GenCode(pnode->child[0]);
-		EMITCODE("popl %eax\n");
-		EMITCODE("movl %ebx,$4\n");  //int = 4  
-		EMITCODE("xor %edx, %edx\nimull %ebx\n");
-		EMITCODE("addl %esi,%eax\n");
-
-		EMITCODE("popl %eax\n");
-		EMITCODE("movl %eax, -0(%esi); assign\n");		
-
-
-	}
-	else if (pnode->attr.op==TOKEN_RECORD){  //x.x:=1
-    	
-	}*/
 }
 
 char* GetLabel()
@@ -522,14 +437,14 @@ char* GetSysLabel(int val)
 }
 
 char* GetDataLabel(){
-    static int datalabel_cnt = 0;
-    char tmp[100];
-    static char datalabel[200];
-    strcpy(datalabel, "_CONST_VAR_");
-    sprintf(tmp, "%d", datalabel_cnt);
-    strcat(datalabel, tmp);
-    datalabel_cnt++;
-    return datalabel;
+	static int datalabel_cnt = 0;
+	char tmp[100];
+	static char datalabel[200];
+	strcpy(datalabel, "_CONST_VAR_");
+	sprintf(tmp, "%d", datalabel_cnt);
+	strcat(datalabel, tmp);
+	datalabel_cnt++;
+	return datalabel;
 }
 
 
@@ -570,7 +485,7 @@ void HandleCaseExp(TreeNode* pnode){
 	EMITCODE("popl %ebx\n");
 	EMITCODE("cmpl %ebx,%eax\n");
 
-	sprintf(tmp, "jne %s\n", case_end);  //unequal
+	sprintf(tmp, "jne %s\n", case_end);  
 	EMITCODE(tmp);
 
 	GenCode(pnode->child[1]);
@@ -630,17 +545,17 @@ void HandleForStmt(TreeNode* pnode){
 	strcpy(for_start, GetLabel());
 	strcpy(for_end, GetLabel());
 
-	//chuzhi
+
 	GenCode(pnode->child[1]);
 	EMITCODE("pushl %eax\n");
 	GenCode(pnode->child[0]);
 	EMITCODE("popl %eax\n");
-	//EMITCODE("addl %ecx, %esi\n");
+
 	EMITCODE("movl %eax, -0(%esi)  \n");
 
 	
-	//xunhuan
-	if(pnode->attr.op == TOKEN_TO){  //to
+
+	if(pnode->attr.op == TOKEN_TO){ 
 		sprintf(tmp,"%s:\n",for_start);
 		EMITCODE(tmp);	
 		GenCode(pnode->child[2]);
@@ -683,7 +598,7 @@ void HandleForStmt(TreeNode* pnode){
 		EMITCODE(tmp);	
 		sprintf(tmp,"%s:\n",for_end);
 		EMITCODE(tmp);	
-	 } //downto
+	 } 
 }
 
 
@@ -694,13 +609,13 @@ void HandleIfStmt(TreeNode* pnode){
 	strcpy(else_label, GetLabel());
 	strcpy(exit_label, GetLabel());
 	
-	//panduan
+
 	GenCode(pnode->child[0]);
 	EMITCODE("cmpl $1, %eax\n");	
 	sprintf(tmp, "je %s \njmp %s\n", if_label, else_label);
 	EMITCODE(tmp);	
 	
-	//if-part
+
 	sprintf(tmp,"%s:\n",if_label);
 	EMITCODE(tmp);	
 	GenCode(pnode->child[1]);
@@ -723,8 +638,8 @@ void HandleOutStmt(TreeNode* pnode){
 	TreeNode *tt=NULL;
 	
 
-//	if (pnode->child[0]!=NULL)
-		tt=pnode->child[0];
+
+	tt=pnode->child[0];
 
 	while (tt!=NULL){
 		CGNodeExpression(tt);	
@@ -732,8 +647,8 @@ void HandleOutStmt(TreeNode* pnode){
 		if (tt->RuningType==EXPTYPE_REAL){
 			EMITCODE("pusha\n");
 			EMITCODE("pushl %eax\n");
-			// EMITCODE("flds (%eax)\n");
-			EMITCODE("flds (%esp)\n");				// make the original
+			
+			EMITCODE("flds (%esp)\n");				
 			EMITCODE("subl $4, %esp\n");
 			EMITCODE("fstpl (%esp)\n");
 			if  (pnode->attr.op==TOKEN_WRITELN){
@@ -758,20 +673,10 @@ void HandleOutStmt(TreeNode* pnode){
 			}
 			else {
 				if  (pnode->attr.op==TOKEN_WRITELN){
-					// EMITCODE("pushl %eax\n");
 					strcpy(output, "pushl $.OUTPUT_I_N\n");
-					// EMITCODE("pushl $.OUTPUT_I_N\n");
-					// EMITCODE("call printf\n");
-					// EMITCODE("addl $8, %esp\n");				
-					// EMITCODE("invoke printf,offset lb_writeln_int, %eax\n");
 				}
 				else{
-					// EMITCODE("pushl %eax\n");
 					strcpy(output, "pushl $.INOUT_I\n");
-					// EMITCODE("pushl $.INOUT_I\n");
-					// EMITCODE("call printf\n");
-					// EMITCODE("addl $8, %esp\n");	
-					// EMITCODE("invoke printf,offset lb_write_int, %eax\n");
 				}
 			}		
 			EMITCODE("pushl %eax\n");
@@ -805,18 +710,13 @@ void HandleInStmt(TreeNode* pnode){
 
 	char output[100];
 
-//	if (pnode->child[0]!=NULL)
 	tt=pnode->child[0];
 
 	while (tt!=NULL){
-		// printf("\n%d\n", tt->kind);
+
 		
 		CGNodeExpression(tt);
-		/* 
-		 As the above line generate the value of the token value,
-		 yet the function scanf require the address of the variable 
-		 So we need to move the address register to %eax
-		 */
+
 		EMITCODE("movl %esi, %eax\n");
 
 
@@ -831,9 +731,7 @@ void HandleInStmt(TreeNode* pnode){
 		EMITCODE("call scanf\n");
 		EMITCODE("addl $8, %esp\n")
 		EMITCODE("popa\n");
-		// EMITCODE("movl %eax, dword ptr lb_tmp\n");			// UNDONE
-		// EMITCODE("movl %eax, (%esi)\n");
-		// printf(output_all);
+
 		tt=tt->sibling;
 	}
 	
@@ -845,13 +743,9 @@ void HandleInStmt(TreeNode* pnode){
 void CGNodeExpression(TreeNode* pnode){
 	switch (pnode->kind+(NODE_EXPRESSION<<4)){
 				case EXP_ID:
-				//printf("EXP_ID\n");
-				//fflush(stdout);
 					HandleExpId(pnode);
 					break;
 				case EXP_OP:
-				//printf("EXP_OP\n");
-				//fflush(stdout);
 					HandleExpOp(pnode);
 					break;
 				case EXP_CONST:
@@ -871,12 +765,8 @@ void GenCode(TreeNode* pnode){
 	int size_param;
 	switch (pnode->nodekind){
 		case NODE_STATEMENT:
-			//printf("NODE_STATEMENT\n");
-			//fflush(stdout);
 			switch (pnode->kind+(NODE_STATEMENT<<4)){
 				case STMT_ASSIGN:
-					//printf("STMT_ASSIGN\n");
-					//fflush(stdout);
 					HandleAssignStmt(pnode);
 					break;
 				case STMT_IF:
@@ -922,15 +812,11 @@ void GenCode(TreeNode* pnode){
 			}
 			break;
 		case NODE_EXPRESSION:
-				//printf("NODE_EXPRESSION\n");
-				//fflush(stdout);
 				CGNodeExpression(pnode);
 			break;
 		case NODE_DECLARE:
 			switch (pnode->kind+(NODE_DECLARE<<4)){
 				case DECL_ROUTINEHEAD:
-					//printf("DECL_ROUTINEHEAD\n");
-					//fflush(stdout);
 
 					size_param=enterNewScope(pnode);
 
@@ -942,7 +828,6 @@ void GenCode(TreeNode* pnode){
 						EMITCODE(tmp);
 					}
 					else {
-						// EMITCODE("main PROC\n");
 						EMITCODE(".globl main\n");
 						EMITCODE("\t.type main, @function\n");
 						EMITCODE("main:\n");
@@ -957,14 +842,11 @@ void GenCode(TreeNode* pnode){
 
   					break;
 				case DECL_FUNCTION:
-
-					//printf("DECL_FUNCTION\n");
-					//fflush(stdout);
 					
-					funcListInsert(pnode->child[0]);  // give congjie function_head!!!!!!!!!!!!!
+					funcListInsert(pnode->child[0]);  
 
 					(pnode->child[1])->attr.name=(pnode->child[0])->attr.name;
-					GenCode(pnode->child[1]); //routine_head 
+					GenCode(pnode->child[1]); 
 	
 					
 					size_param=leaveScope();
@@ -973,15 +855,15 @@ void GenCode(TreeNode* pnode){
 					EMITCODE("ret\n");	
 
 					break;
-    			case DECL_PROCEDURE:
+    				case DECL_PROCEDURE:
 	
-					//printf("DECL_PROCEDURE\n");
+					
 					fflush(stdout);
 					
-					procListInsert(pnode->child[0]);  // give congjie function_head!!!!!!!!!!!!!
+					procListInsert(pnode->child[0]);  
 
 					(pnode->child[1])->attr.name=(pnode->child[0])->attr.name;
-					GenCode(pnode->child[1]); //routine_head 
+					GenCode(pnode->child[1]);
 				
 					size_param=leaveScope();
 					sprintf(tmp, "addl $%d, %%esp\n", size_param);
@@ -1007,23 +889,7 @@ int CG_main(TreeNode* pnode,char * ffname){
 
 	codename = fopen("code_part.asm", "w");
 	dataname = fopen("data_part.asm", "w");
-/*	
-EMITCODE("section .data\n");
-EMITCODE("\tintformat db \"%d\",0xa,0\n");     
-EMITCODE("section .text\n");
-EMITCODE("\tglobal main\n");
-EMITCODE("main:\n");
-*/
-	
-	// EMITDATA(".386\n");
-	// EMITDATA(".model flat,stdcall\n");
-	// EMITDATA("option casemap:none\n");
-	// EMITDATA("include masm32\\include\\msvcrt.inc\n");
-	// EMITDATA("includelib msvcrt.lib\n");
 
-	// EMITDATA("printf  proto C:dword,:dword\n");
-
-	// EMITDATA(".data\n");
 	EMITDATA(".INOUT_I:\n");
 	EMITDATA("\t.string \"%i\"\n");
 	EMITDATA(".OUTPUT_I_N:\n");
@@ -1043,13 +909,6 @@ EMITCODE("main:\n");
 	EMITDATA("\t.string \"%s\"\n");
 	EMITDATA(".OUTPUT_S_N:\n");
 	EMITDATA("\t.string \"%s\\n\"\n");
-	// EMITDATA("lb_write_int db '%d',0\n");
-	// EMITDATA("lb_writeln_int db '%d',0ah,0dh,0\n");
-	// EMITDATA("lb_write_real db '%lf',0\n");
-	// EMITDATA("lb_writeln_real db '%lf',0ah,0dh,0\n");
-	// EMITDATA("lb_tmp db 0, 0, 0, 0, 0, 0, 0, 0\n");
-	// EMITDATA("lb_read_int db '%d',0\n");
-	// EMITDATA("lb_read_real db '%f',0\n");
 
 	EMITCODE(".text\n");	
 	
@@ -1058,13 +917,11 @@ EMITCODE("main:\n");
 	GenCode(pnode);
 	
 
-	size_param=leaveScope();  //li kai zhu yu shi
+	size_param=leaveScope();  
 	sprintf(tmp, "addl $%d, %%esp\n", size_param);
   	EMITCODE(tmp);	
   	EMITCODE("leave\n");
   	EMITCODE("ret\n");
-	// EMITCODE("main ENDP\n");
-	// EMITCODE("END main\n");
 	fclose(codename);
 	fclose(dataname);
 	
