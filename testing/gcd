@@ -11,5 +11,5 @@ end;
 
 begin
 j:=gcd(36,24);
-write(j);
+writeln(j);
 end.

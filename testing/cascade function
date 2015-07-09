@@ -1,0 +1,28 @@
+program a; 
+var
+i:integer;
+function f(x:integer):integer;
+var j:integer;
+   function g(x:integer):integer;
+   var k:integer;
+      function h(x:integer):integer;
+      begin
+          i:=10;
+          j:=19;
+          k:=0;
+          h:=x;
+      end;
+   begin
+    g:=h(x+1);
+    writeln(i);   
+   end; 
+begin
+  f:=g(x+1);
+  writeln(j);
+end;
+
+begin
+i:=f(1);
+writeln(i);
+end.
+

@@ -1,15 +1,15 @@
 program a; 
 type
- stu=record
- num:integer;
- price:real;
+ tank=record
+ wheel:integer;
+ cost:real;
 end;
 var
- student:stu;
+ tank_ins:tank;
 
 begin
-student.num:=313;
-student.price:=9.876;
-writeln(student.num);
-writeln(student.price);
+tank_ins.wheel:=5;
+tank_ins.cost:=11235.56;
+writeln(tank_ins.wheel);
+writeln(tank_ins.cost);
 end.
