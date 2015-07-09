@@ -42,19 +42,19 @@ char* GetDataLabel(){
 	return datalabel;
 }
 
-void PopParam(TreeNode* pnode,SimpleTypeList judge_var){
+void PopParam(TreeNode* pnode,SimpleTypeList varList){
 	
-	if (pnode==NULL || judge_var==NULL)
+	if (pnode==NULL || varList==NULL)
 		return;
 
-	if (judge_var->isVar==1){
+	if (varList->isVar==1){
 		HandleNodeExp(pnode);
 		EMITCODE("popl %eax\n");
 		EMITCODE("movl %eax, (%esi)\n");
 	}
 	else EMITCODE("popl %eax\n");
 
-	PopParam(pnode->sibling,judge_var->next);
+	PopParam(pnode->sibling,varList->next);
 }
 
 void PushParam(TreeNode* pnode){
@@ -110,20 +110,14 @@ void HandleAssignStmt(TreeNode* pnode){
 }
 
 void HandleCaseExp(TreeNode* pnode){
-
 	char case_end[100];	
 	strcpy(case_end, GetLabel());	
-
-	GenCode(pnode->child[0]);
-	
+	GenCode(pnode->child[0]);	
 	EMITCODE("popl %ebx\n");
 	EMITCODE("cmpl %ebx,%eax\n");
-
 	sprintf(tmp, "jne %s\n", case_end);  
 	EMITCODE(tmp);
-
 	GenCode(pnode->child[1]);
-
 	sprintf(tmp, "%s:\n", case_end);
 	EMITCODE(tmp);
 	if (pnode->sibling!=NULL)
@@ -131,18 +125,16 @@ void HandleCaseExp(TreeNode* pnode){
 }
 
 void HandleCaseStmt(TreeNode* pnode){
-
-	char case_end[100];	
-	strcpy(case_end, GetLabel());	
-
+	char caseEd[100];	
+	strcpy(caseEd, GetLabel());	
 	GenCode(pnode->child[0]);
 	EMITCODE("pushl %eax\n");
 	GenCode(pnode->child[1]);
 }
 
 void HandleConstExp(TreeNode* pnode){
-	char const_real_data[100];	
-	char const_string_data[100];
+	char constReal[100];	
+	char constString[100];
 	switch (pnode->type){
 		case EXPTYPE_BOOL:
 			sprintf(tmp, "movl $%d, %%eax\t# calculate bool ExpConst \n", pnode->attr.val);
@@ -160,19 +152,19 @@ void HandleConstExp(TreeNode* pnode){
 			pnode->RuningType = EXPTYPE_INT;
 			break;
 		case EXPTYPE_REAL:
-			strcpy(const_real_data, GetDataLabel());
-			sprintf(tmp, ".%s:\n\t.float %lf\n", const_real_data, pnode->attr.real_val);
+			strcpy(constReal, GetDataLabel());
+			sprintf(tmp, ".%s:\n\t.float %lf\n", constReal, pnode->attr.real_val);
 		    EMITDATA(tmp);
-        	sprintf(tmp,"movl $.%s, %%ebx\t# calculate real ExpConst \n", const_real_data);
+        	sprintf(tmp,"movl $.%s, %%ebx\t# calculate real ExpConst \n", constReal);
         	EMITCODE(tmp);
         	EMITCODE("movl (%ebx), %eax\n");			
         	pnode->RuningType = EXPTYPE_REAL;
 			break;	
 		case EXPTYPE_STRING:							
-			strcpy(const_string_data, GetDataLabel());
-			sprintf(tmp, ".%s:\n\t.string \"%s\"\n", const_string_data, pnode->attr.string_val);
+			strcpy(constString, GetDataLabel());
+			sprintf(tmp, ".%s:\n\t.string \"%s\"\n", constString, pnode->attr.string_val);
 			EMITDATA(tmp);
-			sprintf(tmp,"movl $.%s, %%eax\t# calculate string ExpConst \n", const_string_data);
+			sprintf(tmp,"movl $.%s, %%eax\t# calculate string ExpConst \n", constString);
 			EMITCODE(tmp);
 			pnode->RuningType = EXPTYPE_STRING;
 			break;
@@ -183,9 +175,8 @@ void HandleExpId(TreeNode* pnode){
 	int level;
 	int offset;
 	int lower;
-	ExpType cgtype;
-	LookupRet st_var;
-
+	ExpType expType;
+	LookupRet stVar;
 	VariableList ssvar=varListLookup(pnode->attr.name);
  	if (ssvar==NULL){
  		if (!pnode->ERROR_STATE){
@@ -194,10 +185,8 @@ void HandleExpId(TreeNode* pnode){
  		}
  		return;
  	}
-
- 	cgtype=ssvar->type;
-
-	if (cgtype==EXPTYPE_ARRAY){ 
+ 	expType=ssvar->type;
+	if (expType==EXPTYPE_ARRAY){ 
 		if (ssvar->pAttr==NULL){
 			if (!pnode->ERROR_STATE){
  				ErrorHandler(ERROR_VAR_NOTARRAY, pnode);
@@ -205,23 +194,22 @@ void HandleExpId(TreeNode* pnode){
  			}
  			return;
  		}
-
 		lower=(((ArrayDef)ssvar->pAttr)->subBound)->LowerBound.i;
 		level=ssvar->memloc.baseLoc;
 		offset=ssvar->memloc.offset;
 
 	}
-	else if (cgtype==EXPTYPE_RECORD){ 
-		st_var=recordLookup(pnode->attr.name,(pnode->child[0])->attr.name);
-		level=st_var.jumpLevel;
-		offset=st_var.totalOff;
+	else if (expType==EXPTYPE_RECORD){ 
+		stVar=recordLookup(pnode->attr.name,(pnode->child[0])->attr.name);
+		level=stVar.jumpLevel;
+		offset=stVar.totalOff;
 	}
 	else {	 
 		level=ssvar->memloc.baseLoc;
 		offset=ssvar->memloc.offset;
 	}
 
-	if (cgtype==EXPTYPE_ARRAY){
+	if (expType==EXPTYPE_ARRAY){
 		HandleNodeExp(pnode->child[0]);
 		sprintf(tmp,"movl $%d, %%ebx\n",lower);                 
 		EMITCODE(tmp);	
@@ -237,13 +225,12 @@ void HandleExpId(TreeNode* pnode){
 		EMITCODE(tmp);	
 	}
 
-	if (cgtype==EXPTYPE_ARRAY){ 
-		cgtype=((ArrayDef)ssvar->pAttr)->arrayType;
+	if (expType==EXPTYPE_ARRAY){ 
+		expType=((ArrayDef)ssvar->pAttr)->arrayType;
 	}
-	else if (cgtype==EXPTYPE_RECORD){
-		cgtype=st_var.type;	
+	else if (expType==EXPTYPE_RECORD){
+		expType=stVar.type;	
 	}		
-
 	EMITCODE("movl %ecx, %esi\n");
 	while (level){
 		EMITCODE("movl (%esi), %eax\n");
@@ -252,12 +239,12 @@ void HandleExpId(TreeNode* pnode){
 	}
 	EMITCODE("addl %edi, %esi\n");
 
-	if (cgtype==EXPTYPE_INT || cgtype==EXPTYPE_CHAR || cgtype==EXPTYPE_BOOL){
+	if (expType==EXPTYPE_INT || expType==EXPTYPE_CHAR || expType==EXPTYPE_BOOL){
 		EMITCODE("movl (%esi), %eax\t# calculate ExpId \n");
 		pnode->RuningType=EXPTYPE_INT;
 
 	}
-	else if (cgtype==EXPTYPE_REAL){
+	else if (expType==EXPTYPE_REAL){
 		EMITCODE("movl (%esi), %eax\n"); 		
 		pnode->RuningType=EXPTYPE_REAL;
 
@@ -419,7 +406,6 @@ void HandleForStmt(TreeNode* pnode){
 
 	strcpy(forSt, GetLabel());
 	strcpy(forEd, GetLabel());
-
 	GenCode(pnode->child[1]);
 	EMITCODE("pushl %eax\n");
 	GenCode(pnode->child[0]);
@@ -467,8 +453,7 @@ void HandleForStmt(TreeNode* pnode){
 }
 
 void HandleFuncExc(TreeNode* pnode){
-	FuncList judge_var=funcListLookup(pnode->attr.name);
-
+	FuncList varList=funcListLookup(pnode->attr.name);
 	EMITCODE("pushl %eax\n");  	
 	PushParam(pnode->child[0]);
 	EMITCODE("pushl %ecx\n");  
@@ -476,7 +461,7 @@ void HandleFuncExc(TreeNode* pnode){
 	sprintf(tmp, "call %s\n", pnode->attr.name);
 	EMITCODE(tmp);
 	EMITCODE("popl %ecx\n");
-	PopParam(pnode->child[0],judge_var->paraList);
+	PopParam(pnode->child[0],varList->paraList);
 	EMITCODE("popl %eax\n");  
 }
 
@@ -622,25 +607,25 @@ void HandleOutStmt(TreeNode* pnode){
 }
 
 void HandleProcExc(TreeNode* pnode){
-	ProcList judge_var=procListLookup(pnode->attr.name);
+	ProcList varList=procListLookup(pnode->attr.name);
 	PushParam(pnode->child[0]);
 	EMITCODE("pushl %ecx\n");  
 	EMITCODE("movl %esp, %ecx\n");
 	sprintf(tmp, "call %s\n", pnode->attr.name);
 	EMITCODE(tmp);
 	EMITCODE("popl %ecx\n");
-	PopParam(pnode->child[0],judge_var->paraList);
+	PopParam(pnode->child[0],varList->paraList);
 }
 
 void HandleProcExc(TreeNode* pnode){
-	ProcList judge_var=procListLookup(pnode->attr.name);
+	ProcList varList=procListLookup(pnode->attr.name);
 	PushParam(pnode->child[0]);
 	EMITCODE("pushl %ecx\n");  
 	EMITCODE("movl %esp, %ecx\n");
 	sprintf(tmp, "call %s\n", pnode->attr.name);
 	EMITCODE(tmp);
 	EMITCODE("popl %ecx\n");
-	PopParam(pnode->child[0],judge_var->paraList);
+	PopParam(pnode->child[0],varList->paraList);
 }
 
 void HandleWhileStmt(TreeNode* pnode){
