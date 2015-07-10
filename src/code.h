@@ -1,7 +1,7 @@
-#ifndef _CG_H_
-#define _CG_H_
+#ifndef _CODE_H_
+#define _CODE_H_
 
-#include<stdio.h>
+#include <stdio.h>
 #include "global.h"
 #include "y.tab.h"
 #include "analyze.h"
@@ -36,4 +36,4 @@ void HandleWhileStmt(TreeNode* pnode);
 
 void GenCode(TreeNode* pnode);
 
-#endif
+#endif /* _CODE_H_ */

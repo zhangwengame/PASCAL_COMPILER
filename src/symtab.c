@@ -5,22 +5,12 @@
 #include "analyze.h"
 
 #define ERROR_RETURN 0xffff
-
-/*define size of the hash table*/
 #define SIZE 211
-
-/*define parameter offset increase*/
 #define PARA_OFFSET_INC 4
-
-/*define SHIFT, use 2^SHIFT as multiplier in hash function*/
 #define SHIFT 4
-
-/*define enum type max length*/
 #define ID_MAX_LEN 10
 
 int currentNestLevel = 0;
-
-/*the hash function*/
 static int hash (char* key) {
 	int temp = 0;
 	int i = 0;
@@ -32,23 +22,10 @@ static int hash (char* key) {
 	return temp;
 }
 
-/*===============定义符号表，分为变量、类型、函数、过程四个子表================*/
-
-
-
-/*the hash table of variables*/
 static VariableList variableHashTable[SIZE];
-
-/*the hash table of types*/
 static TypeList typeHashTable[SIZE];
-
-/*the hash table of function*/
 static FuncList funcHashTable[SIZE];
-
-/*the hash table of procedure*/
 static ProcList procHashTable[SIZE];
-
-/*record the total offset of each scope*/
 static int totalOffset[50];
 
 void ErrorHandler(int errortype, TreeNode * pnode){
@@ -82,9 +59,6 @@ void ErrorHandler(int errortype, TreeNode * pnode){
 	++ERROR_COUNT;
 }
 
-/*=========================定义对符号表的插入操作=================================*/
-
-/*build a new sub-bound type definition*/
 SubBoundDef newSubBoundDef(ExpType type, void* lower, void* upper) {
 	SubBoundDef new = (SubBoundDef) malloc(sizeof(struct SubBoundDefRec));
 	new->boundType = type;
@@ -102,7 +76,6 @@ SubBoundDef newSubBoundDef(ExpType type, void* lower, void* upper) {
 	return new;
 }
 
-/*build a new array definition*/
 ArrayDef newArrayDef(ExpType arrayType, ExpType boundType, void* lower, void* upper) {
 	ArrayDef new = (ArrayDef) malloc(sizeof(struct ArrayDefRec));
 	new->arrayType = arrayType;
@@ -111,7 +84,6 @@ ArrayDef newArrayDef(ExpType arrayType, ExpType boundType, void* lower, void* up
 	return new;
 }
 
-/*build a new enum definition*/
 EnumDef newEnumDef(char* mark) {
 	EnumDef new = (EnumDef) malloc(sizeof(struct EnumDefRec));
 	new->mark = mark;
@@ -128,7 +100,6 @@ EnumDef insertEnumDef(EnumDef enumList, char* mark) {
 	return enumList->next; 
 }
 
-/*build a new type list node*/
 TypeList newTypeDef(char* name, ExpType type, int nestLevel, void* pAttr, int size) {
 	TypeList new = (TypeList) malloc(sizeof(struct TypeListRec));
 	new->name = name;
@@ -149,7 +120,6 @@ TypeList insertTypeDef(TypeList typeList, char* name, ExpType type, int nestLeve
 	return typeList->next;
 }
 
-/*build a new record definition*/
 RecordDef newDefinedRecord(TypeList ptr) {
 	RecordDef new = (RecordDef) malloc(sizeof(struct RecordNodeRec));
 	new->type = DEFINED;
@@ -168,7 +138,6 @@ RecordDef newAnonyRecord(TypeList typeList) {
 	return new;
 }
 
-/*build a simple type list*/
 SimpleTypeList newSimpleTypeList(char* name, ExpType type, int isVar) {
 	SimpleTypeList new = (SimpleTypeList) malloc(sizeof(struct SimpleTypeListRec));
 	new->name = name;
@@ -186,7 +155,6 @@ SimpleTypeList insertSimpleTypeList(SimpleTypeList simpleList, char* name, ExpTy
 	return simpleList->next;
 }
 
-/*insert line numbers and memory location into the process hash table*/
 int procListInsert(TreeNode* procHead) {
 
 	char* name = procHead->attr.name;
@@ -242,7 +210,6 @@ int procListInsert(TreeNode* procHead) {
 	return offset;
 }
 
-/*insert line numbers and memory location into the function hash table*/
 int funcListInsert(TreeNode* funcHead) {
 
 	char* name = funcHead->attr.name;
@@ -280,9 +247,7 @@ int funcListInsert(TreeNode* funcHead) {
 			
 			tmpNode = tmpNode->sibling;
 		}
-	}
-
-	//符号表插入返回值,与函数同名
+	}	
 	varListInsert(funcHead, funcHead->attr.name, retType, False, paraNestLevel, NULL, funcHead->lineno, 0, offset);
 	offset = offset + PARA_OFFSET_INC;
 
@@ -300,12 +265,9 @@ int funcListInsert(TreeNode* funcHead) {
 		tmp->next = (l == NULL)? NULL:l;
 		funcHashTable[h] = tmp;
 	}
-
 	return offset;
 }
 
-
-/*insert line numbers and memory location into the type hash table*/
 void typeListAliaseInsert(char* name, char* aliase) {
 	int h = hash(name);
 	TypeList l = typeHashTable[h];
@@ -341,18 +303,14 @@ void typeListInsert(char* name, ExpType type, int nestLevel, void* pAttr, int si
 
 }
 
-/*insert line numbers and memory location into the variable hash table*/
 void varListInsert(TreeNode* t, char* name, ExpType type, int isConst, int nestLevel, void* pAttr, int lineno, int baseLoc, int offset) { 
 	int h = hash(name);
 	VariableList l = variableHashTable[h];
 	VariableList tmp = l;
 	while((tmp != NULL) && (strcmp(name, tmp->name)))
 			tmp = tmp->next;
-	//printf("%s %d\n",name,tmp==NULL);
-	//if (tmp!=NULL)
-	//	printf("%s\n",tmp->name);
 	
-	if(tmp == NULL || (strcmp(name, tmp->name)==0 && nestLevel>tmp->nestLevel)) { /*process with same nestlevel not yet in the table, insert to the list head*/
+	if(tmp == NULL || (strcmp(name, tmp->name)==0 && nestLevel>tmp->nestLevel)) { 
 		tmp = (VariableList) malloc(sizeof(struct VariableListRec));
 		tmp->name = name;
 		tmp->type = type;
@@ -366,24 +324,16 @@ void varListInsert(TreeNode* t, char* name, ExpType type, int isConst, int nestL
 		tmp->memloc.offset = offset;
 		tmp->next = (l == NULL)? NULL:l;
 		variableHashTable[h] = tmp;
-		//printf("%s no\n",name);
-	} else { /*find the exact variable*/
+	} else { 
 		LineList t = tmp->lines;
 		while(t->next != NULL)
 			t = t->next;
 		t->next = (LineList) malloc(sizeof(struct LineListRec));
 		t->next->lineno = lineno;
 		t->next->next = NULL;
-		//ErrorHandler(ERROR_VAR_REDEC, t);
-
 	}
 }
 
-
-
-/*=======================定义对符号表的查找操作=================================*/
-
-/*varListLookup returns the VariableList or null if not found*/
 VariableList varListLookup(char* name) {
 	int h = hash(name);
 	VariableList l = variableHashTable[h];
@@ -397,9 +347,7 @@ VariableList varListLookup(char* name) {
 	}
 }
 
-/*funcListLookup returns the FuncList of that name or null if not found*/
 FuncList funcListLookup(char* name) {
-	//printf("here1\n");
 	int h = hash(name);
 	FuncList l = funcHashTable[h];
 	while((l != NULL) && (strcmp(name, l->name)))
@@ -410,7 +358,6 @@ FuncList funcListLookup(char* name) {
 		return l;
 }
 
-/*procListLookup returns the ProcList of that name or null if not found*/
 ProcList procListLookup(char* name) {
 	int h = hash(name);
 	ProcList l = procHashTable[h];
@@ -422,7 +369,6 @@ ProcList procListLookup(char* name) {
 		return l;
 }
 
-/*typeListLookup returns the TypeList of that name or null if not found*/
 TypeList typeListLookup(char* name) {
 	int h = hash(name);
 	TypeList l = typeHashTable[h];
@@ -434,7 +380,6 @@ TypeList typeListLookup(char* name) {
 		return l;
 }
 
-/*array Lookup*/
 LookupRet arrayLookup(char* a, int i) {
 	int lower, upper, size;
 	LookupRet ret;
@@ -454,7 +399,6 @@ LookupRet arrayLookup(char* a, int i) {
 	return ret;
 }
 
-/*recordLookup*/
 LookupRet recordLookup(char* rec, char* a) {
 	VariableList l = varListLookup(rec);
 	TypeList plist;
@@ -482,10 +426,6 @@ LookupRet recordLookup(char* rec, char* a) {
 	return ret;	
 }
 
-
-/*===================定义进出函数或过程时对符号表的更新==========================*/
-
-/*initialize*/
 void initScope() {
 	currentNestLevel = -1;
 	int i;
@@ -497,14 +437,12 @@ void initScope() {
 	}
 }
 
-/*enter new function or process scope*/
 int enterNewScope(TreeNode* t) {
 	currentNestLevel += 1;
 	totalOffset[currentNestLevel] = buildSymtab(t);
 	return 	totalOffset[currentNestLevel];
 }
 
-/*quit function or process scope*/
 int leaveScope() {
 	int tmp = currentNestLevel;
 	int retValue = totalOffset[currentNestLevel];
@@ -546,10 +484,6 @@ int leaveScope() {
 	return retValue;
 }
 
-
-/*=======================定义对符号表的打印操作=================================*/
-
-/*print symbol table*/
 void printSymTab(FILE* listing) {
 	int i;
 	fprintf(listing, "Variable Name	| Level | Line Number\n");
@@ -561,7 +495,6 @@ void printSymTab(FILE* listing) {
 				LineList t = l->lines;
 				fprintf(listing, "%-14s ", l->name);
 				fprintf(listing, "%-8d", l->nestLevel);
-				//fprintf(listing, "%-8d ", l->memloc.offset);
 				while(t != NULL) {
 					fprintf(listing, "%4d ", t->lineno);
 					t = t->next;
