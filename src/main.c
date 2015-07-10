@@ -2,7 +2,7 @@
 #include "util.h"
 #include "scan.h"
 #include "parse.h"
-#include "CG.h"
+#include "code.h"
 #include "symtab.h"
 #include "analyze.h"
 char filename[30] = "test.pas";
