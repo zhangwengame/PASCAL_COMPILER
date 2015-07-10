@@ -66,9 +66,7 @@ void HandleExpOp(TreeNode* pnode){
 		pnode->RuningType=(pnode->child[0])->RuningType;
 	}
 
-	puts("11111");
 	if (pnode->child[0]!=NULL && pnode->child[1]!=NULL && bothConst == 1){
-		puts("2222");
 		if ((pnode->child[0])->type == EXPTYPE_INT){
 			if ((pnode->child[1])->type == EXPTYPE_INT){
 				switch(pnode->attr.op){
@@ -185,7 +183,6 @@ void HandleExpOp(TreeNode* pnode){
 		}
 	}
 	else if (pnode->RuningType==EXPTYPE_INT){
-		puts("3333");
 		EMITCODE("popl %ebx\n");
 		EMITCODE("popl %eax\n");
 		switch(pnode->attr.op)
@@ -245,7 +242,6 @@ void HandleExpOp(TreeNode* pnode){
 		// EMITCODE("flds (%esp)\n");		
 		// to be decided
 		//char fcom_lable_false[100], fcom_lable_end[100]; 
-		puts("4444");
 		if (pnode->child[1]!=NULL&&((pnode->child[1])->RuningType == EXPTYPE_INT)){
 			EMITCODE("filds (%esp)\n");	
 		}

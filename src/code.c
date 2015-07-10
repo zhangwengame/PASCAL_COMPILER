@@ -28,7 +28,6 @@ void HandleExpOp(TreeNode* pnode){
 		// pnode->kind+(NODE_EXPRESSION<<4)
 		if ((pnode->child[0])->kind+(NODE_EXPRESSION<<4) == EXP_CONST && (pnode->child[0])->kind+(NODE_EXPRESSION<<4) == EXP_CONST){
 			bothConst = 1;
-			puts("22223");
 		}
 		else {
 			GenCode(pnode->child[0]);
@@ -67,9 +66,7 @@ void HandleExpOp(TreeNode* pnode){
 		pnode->RuningType=(pnode->child[0])->RuningType;
 	}
 
-	puts("11111");
 	if (pnode->child[0]!=NULL && pnode->child[1]!=NULL && bothConst == 1){
-		puts("2222");
 		if ((pnode->child[0])->type == EXPTYPE_INT){
 			if ((pnode->child[1])->type == EXPTYPE_INT){
 				switch(pnode->attr.op){
@@ -186,7 +183,6 @@ void HandleExpOp(TreeNode* pnode){
 		}
 	}
 	else if (pnode->RuningType==EXPTYPE_INT){
-		puts("3333");
 		EMITCODE("popl %ebx\n");
 		EMITCODE("popl %eax\n");
 		switch(pnode->attr.op)
