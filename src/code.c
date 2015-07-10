@@ -38,7 +38,7 @@ void HandleExpOp(TreeNode* pnode){
 			EMITCODE("pushl %eax\n");
 
 			/*Mismatch Error*/
-			if ((pnode->child[0]->RuningType>EXPTYPE_REAL||pnode->child[0]->RuningType>EXPTYPE_REAL)&&(pnode->child[0]->RuningType != (pnode->child[1])->RuningType)){
+			if ((pnode->child[0]->RuningType>EXPTYPE_REAL)&&(pnode->child[0]->RuningType != (pnode->child[1])->RuningType)){
 				if (!(pnode->child[0]->ERROR_STATE||pnode->child[1]->ERROR_STATE)){
 	 				ErrorHandler(ERROR_TYPE_MISMATCH, pnode);
 	 			}
@@ -51,10 +51,11 @@ void HandleExpOp(TreeNode* pnode){
 	 			return;
 	 		}
 	 		/*Automatically type cast*/
-			if ((pnode->child[0])->RuningType==EXPTYPE_REAL && (pnode->child[1])->RuningType==EXPTYPE_REAL)
+	 		pnode->RuningType=((pnode->child[0]->RuningType)>(pnode->child[1]->RuningType))?pnode->child[0]->RuningType:pnode->child[1]->RuningType;
+			/*if ((pnode->child[0])->RuningType==EXPTYPE_REAL || (pnode->child[1])->RuningType==EXPTYPE_REAL)
 				pnode->RuningType=EXPTYPE_REAL;
 			if ((pnode->child[0])->RuningType==EXPTYPE_INT && (pnode->child[1])->RuningType==EXPTYPE_INT)
-				pnode->RuningType=EXPTYPE_INT; 
+				pnode->RuningType=EXPTYPE_INT; */
 		}
 		
 
